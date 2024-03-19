@@ -19,22 +19,38 @@ class IbanezCrawler
         $url = 'https://ibanez.fandom.com/wiki/GRG270B';
 
         $crawlResponse = $this->client->request('GET', $url)->getContent();
-        //dd($crawlResponse);
-
-        //div.main-container    
         $crawler = new Crawler($crawlResponse);
-        //var_dump($crawler);
-        // foreach ($crawler as $key => $value) {
-        //     var_dump($value->nodeValue);
 
-        echo ('🤡🤡🤡');
+        // $titleNode = $crawler->filterXPath("body//span[@class='mw-page-title-main']");
+
+        // foreach ($titleNode as $key => $value) {
+        //     var_dump($value->nodeValue);
         // }
 
-        $divNodes = $crawler->filterXPath('descendant-or-self::body/div');
+        $title = $crawler->filter('span.mw-page-title-main')->text();
+        var_dump('MODÈLE : ' . $title);
+        // echo ('<br/>');
 
-        foreach ($divNodes as $key => $value) {
-            var_dump($value->nodeValue);
-        }
+        $description = $crawler->filter('div.mw-parser-output')->text();
+        var_dump('Description : ' . $description);
+
+        $classesMet = [];
+        $crawler->filter('span')->each(function (Crawler $node, $i) {
+            var_dump($i, $node->text());
+            //dd($node->text());
+            $classesMet[] = $node->text();
+            //$classesMet[] = $node->attr('class', 'pop');
+        });
+
+        dd($classesMet);
+
+        // $divNodes = $crawler->filterXPath('descendant-or-self::body/div');
+
+        // foreach ($divNodes as $key => $value) {
+        //     var_dump($value->nodeValue);
+        // }
+
+        //______________________________________
         // var_dump($divNodes->getNode(0)->nodeName);
         // var_dump($divNodes->getNode(0)->nodeType);
         // var_dump($divNodes->getNode(0)->nodeValue);
