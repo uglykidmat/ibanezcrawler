@@ -14,33 +14,29 @@ class IbanezCrawler
         $this->client = $client->withOptions([]);
     }
 
-    public function crawl(): JsonResponse
+    public function crawl(): string
     {
+        //____________________URL
         $url = 'https://ibanez.fandom.com/wiki/GRG270B';
 
+        //____________________CLIENT
         $crawlResponse = $this->client->request('GET', $url)->getContent();
+
+        //____________________CRAWLER
         $crawler = new Crawler($crawlResponse);
 
-        // $titleNode = $crawler->filterXPath("body//span[@class='mw-page-title-main']");
+        //____________________CRAWL-TITLE
+        $title = $crawler->filterXPath("//span[@class='mw-page-title-main']")->text();
 
-        // foreach ($titleNode as $key => $value) {
-        //     var_dump($value->nodeValue);
-        // }
+        // $title = $crawler->filter('span.mw-page-title-main')->text();
 
-        $title = $crawler->filter('span.mw-page-title-main')->text();
-        var_dump('MODÈLE : ' . $title);
-
-        $descriptionParagraphs = $crawler->filterXPath('descendant-or-self::div[@class="mw-parser-output"]//p');
-
+        //____________________CRAWL-DESCRIPTION
         $description = '';
+        $descriptionParagraphs = $crawler->filterXPath('descendant-or-self::div[@class="mw-parser-output"]//p');
 
         foreach ($descriptionParagraphs as $paragraph) {
             $description .= $paragraph->textContent;
-            print_r($paragraph->textContent);
-            echo ('<br/>');
         }
-
-        print_r($description);
 
         //____________________________________________--
         // $classesMet = [];
@@ -67,11 +63,13 @@ class IbanezCrawler
         // $bodyNode = $crawler->filterXPath('child::node()');
         // var_dump($bodyNode);
 
+        //____________________CRAWL-OUTPUT
         $outputContent = json_encode(['title' => $title, 'description' => $description]);
 
-        $output = new JsonResponse();
-        $output->setContent($outputContent);
-        return $output;
+        // $output = new JsonResponse();
+        // $output->setContent($outputContent);
+
+        return $outputContent;
     }
 
     public function getIbanezData()
