@@ -29,21 +29,30 @@ class IbanezCrawler
 
         $title = $crawler->filter('span.mw-page-title-main')->text();
         var_dump('MODÈLE : ' . $title);
-        // echo ('<br/>');
 
-        $description = $crawler->filter('div.mw-parser-output')->text();
-        var_dump('Description : ' . $description);
+        $descriptionParagraphs = $crawler->filterXPath('descendant-or-self::div[@class="mw-parser-output"]//p');
 
-        $classesMet = [];
-        $crawler->filter('span')->each(function (Crawler $node, $i) {
-            var_dump($i, $node->text());
-            //dd($node->text());
-            $classesMet[] = $node->text();
-            //$classesMet[] = $node->attr('class', 'pop');
-        });
+        $description = '';
 
-        dd($classesMet);
+        foreach ($descriptionParagraphs as $paragraph) {
+            $description .= $paragraph->textContent;
+            print_r($paragraph->textContent);
+            echo ('<br/>');
+        }
 
+        print_r($description);
+
+        //____________________________________________--
+        // $classesMet = [];
+        // $crawler->filter('span')->each(function (Crawler $node, $i) {
+        //     var_dump($i, $node->text());
+        //     //dd($node->text());
+        //     $classesMet[] = $node->text();
+        //     //$classesMet[] = $node->attr('class', 'pop');
+        // });
+
+        // dd($classesMet);
+        //____________________________________________--
         // $divNodes = $crawler->filterXPath('descendant-or-self::body/div');
 
         // foreach ($divNodes as $key => $value) {
@@ -58,16 +67,10 @@ class IbanezCrawler
         // $bodyNode = $crawler->filterXPath('child::node()');
         // var_dump($bodyNode);
 
-        // $allnodes = [];
-        // foreach ($crawler as $domElement) {
-        //     //$allnodes[] = $domElement->nodeName;
-        //     echo ('🤡');
-        //     var_dump($domElement->nodeName);
-        // }
-        //dd($allnodes);
+        $outputContent = json_encode(['title' => $title, 'description' => $description]);
 
         $output = new JsonResponse();
-        $output->setContent('ok');
+        $output->setContent($outputContent);
         return $output;
     }
 

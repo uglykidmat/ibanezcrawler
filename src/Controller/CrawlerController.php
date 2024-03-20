@@ -19,11 +19,11 @@ class CrawlerController extends AbstractController
     public function index(): JsonResponse
     {
         //$crawler = new IbanezCrawler();
-        dd($this->ibanezCrawler->crawl());
-
+        $crawlContent = $this->ibanezCrawler->crawl()->getContent();
+        dd($crawlContent);
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/CrawlerController.php',
+            'data' => $crawlContent,
+            //'path' => 'src/Controller/CrawlerController.php',
         ]);
     }
 }
