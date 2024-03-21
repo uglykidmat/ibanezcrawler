@@ -26,9 +26,7 @@ class IbanezCrawler
         $crawler = new Crawler($crawlResponse);
 
         //____________________CRAWL-TITLE
-        $title = $crawler->filterXPath("//span[@class='mw-page-title-main']")->text();
-
-        // $title = $crawler->filter('span.mw-page-title-main')->text();
+        $model = $crawler->filterXPath("//span[@class='mw-page-title-main']")->text();
 
         //____________________CRAWL-DESCRIPTION
         $description = '';
@@ -38,36 +36,51 @@ class IbanezCrawler
             $description .= $paragraph->textContent;
         }
 
-        //____________________________________________--
-        // $classesMet = [];
-        // $crawler->filter('span')->each(function (Crawler $node, $i) {
-        //     var_dump($i, $node->text());
-        //     //dd($node->text());
-        //     $classesMet[] = $node->text();
-        //     //$classesMet[] = $node->attr('class', 'pop');
-        // });
+        //____________________CRAWL-DETAILS
 
-        // dd($classesMet);
-        //____________________________________________--
-        // $divNodes = $crawler->filterXPath('descendant-or-self::body/div');
+        $bodySpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[1]/table/tbody//td');
+        $neckSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[2]/table/tbody//td');
+        $electronicsAndStringsSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[3]/table/tbody//td');
 
-        // foreach ($divNodes as $key => $value) {
-        //     var_dump($value->nodeValue);
-        // }
+        $bodySpecsKeys = [];
+        $bodySpecsValues = [];
+        $neckSpecsKeys = [];
+        $neckSpecsValues = [];
+        $electronicsAndStringsSpecsKeys = [];
+        $electronicsAndStringsSpecsValues = [];
 
-        //______________________________________
-        // var_dump($divNodes->getNode(0)->nodeName);
-        // var_dump($divNodes->getNode(0)->nodeType);
-        // var_dump($divNodes->getNode(0)->nodeValue);
+        foreach ($bodySpecs as $bodySpec) {
+            if (preg_match('/(.*):(.*)/', $bodySpec->textContent, $matches)) {
+                $bodySpecsKeys[] = $matches[1];
+                $bodySpecsValues[] = $matches[2];
+            }
+        }
+        $bodySpecs = array_combine($bodySpecsKeys, $bodySpecsValues);
 
-        // $bodyNode = $crawler->filterXPath('child::node()');
-        // var_dump($bodyNode);
+        foreach ($neckSpecs as $neckSpec) {
+            if (preg_match('/(.*):(.*)/', $neckSpec->textContent, $matches)) {
+                $neckSpecsKeys[] = $matches[1];
+                $neckSpecsValues[] = $matches[2];
+            }
+        }
+        $neckSpecs = array_combine($neckSpecsKeys, $neckSpecsValues);
+
+        foreach ($electronicsAndStringsSpecs as $electronicsAndStringsSpec) {
+            if (preg_match('/(.*):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
+                $electronicsAndStringsSpecsKeys[] = $matches[1];
+                $electronicsAndStringsSpecsValues[] = $matches[2];
+            }
+        }
+        $electronicsAndStringsSpecs = array_combine($electronicsAndStringsSpecsKeys, $electronicsAndStringsSpecsValues);
 
         //____________________CRAWL-OUTPUT
-        $outputContent = json_encode(['title' => $title, 'description' => $description]);
-
-        // $output = new JsonResponse();
-        // $output->setContent($outputContent);
+        $outputContent = json_encode([
+            'model' => $model,
+            'description' => $description,
+            'body' => $bodySpecs,
+            'neck' => $neckSpecs,
+            'electronicsandstrings' => $electronicsAndStringsSpecs
+        ]);
 
         return $outputContent;
     }

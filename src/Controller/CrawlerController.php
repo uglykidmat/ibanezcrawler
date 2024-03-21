@@ -18,10 +18,7 @@ class CrawlerController extends AbstractController
     #[Route('/crawler', name: 'app_crawler')]
     public function index(): JsonResponse
     {
-        //$crawler = new IbanezCrawler();
         $crawlContent = $this->ibanezCrawler->crawl();
-        //dd($crawlContent);
-
         $resp = new JsonResponse();
         $resp->setContent($crawlContent);
 
