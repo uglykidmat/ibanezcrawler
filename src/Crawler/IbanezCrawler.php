@@ -14,10 +14,11 @@ class IbanezCrawler
         $this->client = $client->withOptions([]);
     }
 
-    public function crawl(): string
+    public function crawl(string $url): string
     {
         //____________________URL
         $url = 'https://ibanez.fandom.com/wiki/GRG270B';
+        //$url = 'https://ibanez.fandom.com/wiki/IJCRG80th3';
 
         //____________________CLIENT
         $crawlResponse = $this->client->request('GET', $url)->getContent();
@@ -50,7 +51,7 @@ class IbanezCrawler
         $electronicsAndStringsSpecsValues = [];
 
         foreach ($bodySpecs as $bodySpec) {
-            if (preg_match('/(.*):(.*)/', $bodySpec->textContent, $matches)) {
+            if (preg_match('/([a-zA-Z]*):(.*)/', $bodySpec->textContent, $matches)) {
                 $bodySpecsKeys[] = $matches[1];
                 $bodySpecsValues[] = $matches[2];
             }
