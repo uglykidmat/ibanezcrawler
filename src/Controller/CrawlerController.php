@@ -16,13 +16,20 @@ class CrawlerController extends AbstractController
     }
 
     #[Route('/crawler', name: 'app_crawler')]
-    public function index(): JsonResponse
+    public function getOneGuitar()
     {
         $url = 'https://ibanez.fandom.com/wiki/GRG270B';
-        $crawlContent = $this->guitarCrawler->crawlOneGuitar($url);
-        $resp = new JsonResponse();
-        $resp->setContent($crawlContent);
 
-        return $resp;
+        return $this->json(
+            $this->guitarCrawler->crawlOneGuitar($url)
+        );
+    }
+
+    #[Route('/crawler/{serie}', name: 'app_crawler_by_serie')]
+    public function getBySerie(string $serie): JsonResponse
+    {
+        return $this->json(
+            $this->guitarCrawler->crawlGuitarCategory($serie)
+        );
     }
 }

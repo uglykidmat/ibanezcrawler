@@ -3,7 +3,6 @@
 namespace App\Crawler;
 
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GuitarCrawler
@@ -14,7 +13,33 @@ class GuitarCrawler
         $this->client = $client->withOptions([]);
     }
 
-    public function crawlOneGuitar(string $url): string
+    public function crawlGuitarCategory(string $serie): array
+    {
+        $url = 'https://ibanez.fandom.com/wiki/Category:' . $serie . '_models';
+        $response = $this->client->request('GET', $url)->getContent();
+
+        //____________________CRAWLER
+        $crawler = new Crawler($response);
+
+        //____________________CRAWL-LINKS
+        $categoryCrawlResult = $crawler->filterXPath('//div[@class="category-page__members"]//li/a/@href');
+
+        //____________________BUILD-MODELS_LIST_URLS
+        $modelsURLs = [];
+        foreach ($categoryCrawlResult as $modelSubpageURL) {
+            $modelsURLs[] = 'https://ibanez.fandom.com' . $modelSubpageURL->textContent;
+        }
+
+        //____________________CRAWL-ONE-BY-ONE
+        $allGuitarsOfCategory = [];
+        foreach ($modelsURLs as $modelURL) {
+            $allGuitarsOfCategory[] = $this->crawlOneGuitar($modelURL);
+        }
+
+        return $allGuitarsOfCategory;
+    }
+
+    public function crawlOneGuitar(string $url): array
     {
         //____________________CLIENT
         $response = $this->client->request('GET', $url)->getContent();
@@ -34,17 +59,27 @@ class GuitarCrawler
         }
 
         //____________________CRAWL-DETAILS
-
+        $details = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[1]');
         $bodySpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[1]/table/tbody//td');
         $neckSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[2]/table/tbody//td');
         $electronicsAndStringsSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[3]/table/tbody//td');
 
+        $detailsKeys = [];
+        $detailsValues = [];
         $bodySpecsKeys = [];
         $bodySpecsValues = [];
         $neckSpecsKeys = [];
         $neckSpecsValues = [];
         $electronicsAndStringsSpecsKeys = [];
         $electronicsAndStringsSpecsValues = [];
+
+        foreach ($details as $detail) {
+            if (preg_match('/([a-zA-Z]*):(.*)/', $detail->textContent, $matches)) {
+                $detailsKeys[] = $matches[1];
+                $detailsValues[] = $matches[2];
+            }
+        }
+        $details = array_combine($detailsKeys, $detailsValues);
 
         foreach ($bodySpecs as $bodySpec) {
             if (preg_match('/([a-zA-Z]*):(.*)/', $bodySpec->textContent, $matches)) {
@@ -71,14 +106,13 @@ class GuitarCrawler
         $electronicsAndStringsSpecs = array_combine($electronicsAndStringsSpecsKeys, $electronicsAndStringsSpecsValues);
 
         //____________________CRAWL-OUTPUT
-        $outputContent = json_encode([
+        return [
             'model' => $model,
             'description' => $description,
+            'details' => $details,
             'body' => $bodySpecs,
             'neck' => $neckSpecs,
             'electronicsandstrings' => $electronicsAndStringsSpecs
-        ]);
-
-        return $outputContent;
+        ];
     }
 }
