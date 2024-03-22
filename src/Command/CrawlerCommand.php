@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 // the name of the command is what users type after "php bin/console"
 #[AsCommand(
     name: 'app:crawler',
-    description: 'Crawls an Ibanez wiki URL.',
+    description: 'Crawls an Ibanez model Category.',
     hidden: false,
 )]
 class CrawlerCommand extends Command
@@ -27,21 +27,28 @@ class CrawlerCommand extends Command
     protected function configure(): void
     {
         $this->addArgument(
-            'url',
+            'model',
             InputArgument::REQUIRED,
-            'The guitar URL to crawl.'
+            'The guitar model to crawl.'
         );
-        $this->setHelp('This command allows you to crawls a guitar URL.');
+        $this->setHelp('This command allows you to crawls a guitar model categorys.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->text('🕷️  Parsing 🕷️' . chr(10) . $input->getArgument('url') . ' ...');
+        $io->text('🕷️ Parsing 🕷️ model ' . strtoupper($input->getArgument('model')) . ' ...');
+
+
+        $modelCategoryResult = $this->ibanezCrawler->crawlGuitarCategory($input->getArgument('model'));
+
+
+
+        file_put_contents(__DIR__ . '/../../public/data/' . $input->getArgument('model') . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT));
+
         $io->success([
-            '🕸️ Crawl results ! 🕸️ ',
-            $this->ibanezCrawler->crawlOneGuitar($input->getArgument('url'))
+            '🕸️ Crawl results ! 🕸️ '
         ]);
 
         return Command::SUCCESS;
