@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Crawler\IbanezCrawler;
+use App\Crawler\GuitarCrawler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class CrawlerCommand extends Command
 {
     public function __construct(
-        private IbanezCrawler $ibanezCrawler
+        private GuitarCrawler $ibanezCrawler
     ) {
         parent::__construct();
     }
@@ -41,7 +41,7 @@ class CrawlerCommand extends Command
         $io->text('🕷️  Parsing 🕷️' . chr(10) . $input->getArgument('url') . ' ...');
         $io->success([
             '🕸️ Crawl results ! 🕸️ ',
-            $this->ibanezCrawler->crawl($input->getArgument('url'))
+            $this->ibanezCrawler->crawlOneGuitar($input->getArgument('url'))
         ]);
 
         return Command::SUCCESS;

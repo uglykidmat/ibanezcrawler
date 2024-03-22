@@ -6,7 +6,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class IbanezCrawler
+class GuitarCrawler
 {
     public function __construct(
         public HttpClientInterface $client,
@@ -14,17 +14,13 @@ class IbanezCrawler
         $this->client = $client->withOptions([]);
     }
 
-    public function crawl(string $url): string
+    public function crawlOneGuitar(string $url): string
     {
-        //____________________URL
-        $url = 'https://ibanez.fandom.com/wiki/GRG270B';
-        //$url = 'https://ibanez.fandom.com/wiki/IJCRG80th3';
-
         //____________________CLIENT
-        $crawlResponse = $this->client->request('GET', $url)->getContent();
+        $response = $this->client->request('GET', $url)->getContent();
 
         //____________________CRAWLER
-        $crawler = new Crawler($crawlResponse);
+        $crawler = new Crawler($response);
 
         //____________________CRAWL-TITLE
         $model = $crawler->filterXPath("//span[@class='mw-page-title-main']")->text();
@@ -84,10 +80,5 @@ class IbanezCrawler
         ]);
 
         return $outputContent;
-    }
-
-    public function getIbanezData()
-    {
-        //$request = new HTTPCli
     }
 }
