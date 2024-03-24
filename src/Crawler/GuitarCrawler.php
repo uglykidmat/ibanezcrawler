@@ -66,7 +66,7 @@ class GuitarCrawler
         $descriptionParagraphs = $crawler->filterXPath('descendant-or-self::div[@class="mw-parser-output"]//p');
 
         foreach ($descriptionParagraphs as $paragraph) {
-            $description .= trim(str_replace('\n', ' ', $paragraph->textContent));
+            $description .= trim(preg_replace("/\r\n|\r|\n/", ' ', $paragraph->textContent));
         }
 
         //____________________CRAWL-DETAILS

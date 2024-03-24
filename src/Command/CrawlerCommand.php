@@ -31,24 +31,22 @@ class CrawlerCommand extends Command
             InputArgument::REQUIRED,
             'The guitar model to crawl.'
         );
-        $this->setHelp('This command allows you to crawls a guitar model categorys.');
+        $this->setHelp('This command allows you to crawls a guitar model category.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+        $model = strtoupper($input->getArgument('model'));
 
-        $io->text('🕷️ Parsing 🕷️ model ' . strtoupper($input->getArgument('model')) . ' ...');
+        $io->text('🕷️ Parsing 🕷️ model ' . $model . ' ...');
 
+        $modelCategoryResult = $this->ibanezCrawler->crawlGuitarCategory($model);
 
-        $modelCategoryResult = $this->ibanezCrawler->crawlGuitarCategory($input->getArgument('model'));
-
-
-
-        file_put_contents(__DIR__ . '/../../public/data/' . $input->getArgument('model') . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT));
+        file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT));
 
         $io->success([
-            '🕸️ Crawl results ! 🕸️ '
+            '🕸️ Crawl results ! 🕸️ See JSON file in public/data'
         ]);
 
         return Command::SUCCESS;
