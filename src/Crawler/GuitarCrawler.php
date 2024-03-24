@@ -13,9 +13,14 @@ class GuitarCrawler
         $this->client = $client->withOptions([]);
     }
 
-    public function crawlGuitarCategory(string $serie): array
+    public function crawlGuitarCategory(string $serie = null, string $nextPage = null, array $allGuitarsOfPage = null): array
     {
-        $url = 'https://ibanez.fandom.com/wiki/Category:' . $serie . '_models';
+        if (!$nextPage) {
+            $url = 'https://ibanez.fandom.com/wiki/Category:' . $serie . '_models';
+        } else {
+            $url = $nextPage;
+        }
+
         $response = $this->client->request('GET', $url)->getContent();
 
         //____________________CRAWLER
@@ -26,17 +31,23 @@ class GuitarCrawler
 
         //____________________BUILD-MODELS_LIST_URLS
         $modelsURLs = [];
-        foreach ($categoryCrawlResult as $modelSubpageURL) {
+        foreach ($categoryCrawlResult as $key => $modelSubpageURL) {
             $modelsURLs[] = 'https://ibanez.fandom.com' . $modelSubpageURL->textContent;
         }
 
         //____________________CRAWL-ONE-BY-ONE
-        $allGuitarsOfCategory = [];
+
         foreach ($modelsURLs as $modelURL) {
-            $allGuitarsOfCategory[] = $this->crawlOneGuitar($modelURL);
+            $allGuitarsOfPage[] = $this->crawlOneGuitar($modelURL);
         }
 
-        return $allGuitarsOfCategory;
+        //____________________Recursive crawl on next pages
+
+        if ($nextPageURL = $crawler->filterXPath('//div[@class="category-page__pagination"]//a[contains(@class,"category-page__pagination-next")]/@href')->getNode(0)) {
+            return $this->crawlGuitarCategory(null, $nextPageURL->textContent, $allGuitarsOfPage);
+        }
+
+        return $allGuitarsOfPage;
     }
 
     public function crawlOneGuitar(string $url): array
@@ -55,7 +66,7 @@ class GuitarCrawler
         $descriptionParagraphs = $crawler->filterXPath('descendant-or-self::div[@class="mw-parser-output"]//p');
 
         foreach ($descriptionParagraphs as $paragraph) {
-            $description .= $paragraph->textContent;
+            $description .= trim(str_replace('\n', ' ', $paragraph->textContent));
         }
 
         //____________________CRAWL-DETAILS
@@ -76,7 +87,7 @@ class GuitarCrawler
         foreach ($details as $detail) {
             if (preg_match('/([a-zA-Z]*):(.*)/', $detail->textContent, $matches)) {
                 $detailsKeys[] = $matches[1];
-                $detailsValues[] = $matches[2];
+                $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
         }
         $details = array_combine($detailsKeys, $detailsValues);
@@ -84,7 +95,7 @@ class GuitarCrawler
         foreach ($bodySpecs as $bodySpec) {
             if (preg_match('/([a-zA-Z]*):(.*)/', $bodySpec->textContent, $matches)) {
                 $bodySpecsKeys[] = $matches[1];
-                $bodySpecsValues[] = $matches[2];
+                $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
         }
         $bodySpecs = array_combine($bodySpecsKeys, $bodySpecsValues);
@@ -92,7 +103,7 @@ class GuitarCrawler
         foreach ($neckSpecs as $neckSpec) {
             if (preg_match('/(.*):(.*)/', $neckSpec->textContent, $matches)) {
                 $neckSpecsKeys[] = $matches[1];
-                $neckSpecsValues[] = $matches[2];
+                $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
         }
         $neckSpecs = array_combine($neckSpecsKeys, $neckSpecsValues);
@@ -100,7 +111,7 @@ class GuitarCrawler
         foreach ($electronicsAndStringsSpecs as $electronicsAndStringsSpec) {
             if (preg_match('/(.*):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
                 $electronicsAndStringsSpecsKeys[] = $matches[1];
-                $electronicsAndStringsSpecsValues[] = $matches[2];
+                $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
         }
         $electronicsAndStringsSpecs = array_combine($electronicsAndStringsSpecsKeys, $electronicsAndStringsSpecsValues);
