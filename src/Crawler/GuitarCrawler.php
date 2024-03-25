@@ -27,7 +27,7 @@ class GuitarCrawler
         $crawler = new Crawler($response);
 
         //____________________CRAWL-LINKS
-        $categoryCrawlResult = $crawler->filterXPath('//div[@class="category-page__members"]//li/a/@href');
+        $categoryCrawlResult = $crawler->filterXPath('//div[@class="category-page__members"]//li/a[@class="category-page__member-link"][not(contains(@href,"Category"))]/@href');
 
         //____________________BUILD-MODELS_LIST_URLS
         $modelsURLs = [];
@@ -36,13 +36,11 @@ class GuitarCrawler
         }
 
         //____________________CRAWL-ONE-BY-ONE
-
         foreach ($modelsURLs as $modelURL) {
             $allGuitarsOfPage[] = $this->crawlOneGuitar($modelURL);
         }
 
         //____________________Recursive crawl on next pages
-
         if ($nextPageURL = $crawler->filterXPath('//div[@class="category-page__pagination"]//a[contains(@class,"category-page__pagination-next")]/@href')->getNode(0)) {
             return $this->crawlGuitarCategory(null, $nextPageURL->textContent, $allGuitarsOfPage);
         }
@@ -59,7 +57,7 @@ class GuitarCrawler
         $crawler = new Crawler($response);
 
         //____________________CRAWL-TITLE
-        $model = $crawler->filterXPath("//span[@class='mw-page-title-main']")->text();
+        $model = trim($crawler->filterXPath("//div[@class='page-header__title-wrapper']")->getNode(0)->nodeValue);
 
         //____________________CRAWL-DESCRIPTION
         $description = '';

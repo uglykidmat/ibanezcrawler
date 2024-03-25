@@ -45,6 +45,7 @@ class CrawlerController extends AbstractController
     #[Route('/crawler/guitars/{serie}', name: 'crawler_guitars_by_serie')]
     public function getBySerie(string $serie): JsonResponse
     {
+        set_time_limit(0);
         return $this->json(
             $this->guitarCrawler->crawlGuitarCategory($serie)
         );
