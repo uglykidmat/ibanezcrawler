@@ -30,9 +30,15 @@ class NeckCrawler
         }
 
         //____________________CRAWL-NECKS
-        $guitarNecksTable = $crawler->filterXPath('//table[contains(@class,"wikitable")]//tr/td');
-        dd($dataTitles);
-        dd($guitarNecksTable);
+        $guitarNecks = [];
+        $guitarNecksTable = $crawler->filterXPath('//table[contains(@class,"wikitable")]//tr');
+        //dd($dataTitles);
+
+        foreach ($guitarNecksTable as $guitarNeck) {
+            var_dump($guitarNeck->textContent);
+            $guitarNecks[] = trim($guitarNeck->textContent);
+        }
+        dd(PHP_INT_MAX);
         return [];
     }
 }
