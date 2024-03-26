@@ -68,7 +68,7 @@ class GuitarCrawler
         }
 
         //____________________CRAWL-DETAILS
-        $details = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[1]');
+        $details = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[1]//tr');
         $bodySpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[1]/table/tbody//td');
         $neckSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[2]/table/tbody//td');
         $electronicsAndStringsSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[3]/table/tbody//td');
@@ -83,7 +83,7 @@ class GuitarCrawler
         $electronicsAndStringsSpecsValues = [];
 
         foreach ($details as $detail) {
-            if (preg_match('/([a-zA-Z]*):(.*)/', $detail->textContent, $matches)) {
+            if (preg_match('/(.*):(.*)/', $detail->textContent, $matches)) {
                 $detailsKeys[] = $matches[1];
                 $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -91,7 +91,7 @@ class GuitarCrawler
         $details = array_combine($detailsKeys, $detailsValues);
 
         foreach ($bodySpecs as $bodySpec) {
-            if (preg_match('/([a-zA-Z]*):(.*)/', $bodySpec->textContent, $matches)) {
+            if (preg_match('/(.*):(.*)/', $bodySpec->textContent, $matches)) {
                 $bodySpecsKeys[] = $matches[1];
                 $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
