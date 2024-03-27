@@ -22,23 +22,61 @@ class NeckCrawler
         $crawler = new Crawler($response);
 
         //____________________CRAWL-TITLES
-        $dataTitles = [];
-        $guitarNecksTableTitles = $crawler->filterXPath('//table[contains(@class,"wikitable")]/tbody/tr/th');
+        $tableTitles = $crawler->filterXPath('//table[contains(@class,"wikitable")]/tbody/tr/th');
 
-        foreach ($guitarNecksTableTitles as $titleNode) {
+        foreach ($tableTitles as &$titleNode) {
             $dataTitles[] = trim($titleNode->textContent);
         }
 
-        //____________________CRAWL-NECKS
-        $guitarNecks = [];
-        $guitarNecksTable = $crawler->filterXPath('//table[contains(@class,"wikitable")]//tr');
+        //____________________CRAWL WIKI TABLE
+        $allTable = $crawler->filterXPath('//table[contains(@class,"wikitable")]//tr');
+        foreach ($allTable as &$node) {
+
+            if (
+                preg_match('/\\n\\n\\n/', $node->textContent)
+            ) {
+                $nodes[] = trim(preg_replace('/\\n\\n\\n/', PHP_EOL . PHP_EOL . '—' . PHP_EOL . PHP_EOL, $node->textContent));
+                //dd($node->textContent);
+            } else {
+                $nodes[] = trim($node->textContent);
+            }
+        }
+        unset($node);
+
+        //____________________REMOVE TITLES
+        array_shift($nodes);
+        //dd($nodes);
+        //____________________TURN STRINGS INTO ARRAYS
+        foreach ($nodes as &$node) {
+            $guitarNecks[] = array_values(array_filter(explode(PHP_EOL, $node)));
+        }
+        unset($node);
+
+        //____________________PROPER NECK PARSING AND REARRANGING
+        foreach ($guitarNecks as $key => &$neck) {
+            //__remove [links]
+            $neck[0] = preg_replace('/\[\d+\]/', '', $neck[0]);
+            // if ($neck[$key] == ' ') {
+            //     dd($neck[$key]);
+            //     $neck[$key] = '—';
+            // }
+            if (preg_match('/((\d\d\d\d)–(\d\d\d\d))|(\d\d\d\d)/', $neck[0])) {
+                array_unshift($neck, $guitarNecks[$key - 1][0]);
+            }
+        }
+        unset($neck);
         //dd($dataTitles);
 
-        foreach ($guitarNecksTable as $guitarNeck) {
-            var_dump($guitarNeck->textContent);
-            $guitarNecks[] = trim($guitarNeck->textContent);
+        //____________________MERGE WITH TITLES
+        foreach ($guitarNecks as $neck) {
+            //$finalNecks = array_combine($dataTitles, $neck);
+            //dd($finalNecks);
+            if (count($dataTitles) != count($neck)) {
+                dd($neck);
+            }
+            $finalNecks[] = array_combine($dataTitles, $neck);
         }
-        dd(PHP_INT_MAX);
-        return [];
+
+        return $finalNecks;
     }
 }
