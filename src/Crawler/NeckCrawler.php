@@ -45,7 +45,7 @@ class NeckCrawler
 
         //____________________REMOVE TITLES
         array_shift($nodes);
-        //dd($nodes);
+
         //____________________TURN STRINGS INTO ARRAYS
         foreach ($nodes as &$node) {
             $guitarNecks[] = array_values(array_filter(explode(PHP_EOL, $node)));
@@ -56,26 +56,19 @@ class NeckCrawler
         foreach ($guitarNecks as $key => &$neck) {
             //__remove [links]
             $neck[0] = preg_replace('/\[\d+\]/', '', $neck[0]);
-            // if ($neck[$key] == ' ') {
-            //     dd($neck[$key]);
-            //     $neck[$key] = '—';
-            // }
-            if (preg_match('/((\d\d\d\d)–(\d\d\d\d))|(\d\d\d\d)/', $neck[0])) {
+
+            if (preg_match('/\d{4}-\d{4}|(?<!\W)(?<!\w)\d{4}/', $neck[0])) {
                 array_unshift($neck, $guitarNecks[$key - 1][0]);
             }
         }
         unset($neck);
-        //dd($dataTitles);
 
         //____________________MERGE WITH TITLES
         foreach ($guitarNecks as $neck) {
-            //$finalNecks = array_combine($dataTitles, $neck);
-            //dd($finalNecks);
-            if (count($dataTitles) != count($neck)) {
-                dd($neck);
-            }
             $finalNecks[] = array_combine($dataTitles, $neck);
         }
+
+        file_put_contents(__DIR__ . '/../../public/data/necks.json', json_encode($finalNecks, JSON_PRETTY_PRINT));
 
         return $finalNecks;
     }
