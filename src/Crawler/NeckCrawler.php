@@ -10,7 +10,7 @@ class NeckCrawler
     public function __construct(
         public HttpClientInterface $client,
     ) {
-        $this->client = $client->withOptions([]);
+        $this->client = $client;
     }
 
     public function crawlGuitarNecks(): array
@@ -27,6 +27,7 @@ class NeckCrawler
         foreach ($tableTitles as &$titleNode) {
             $dataTitles[] = trim($titleNode->textContent);
         }
+        unset($titleNode);
 
         //____________________CRAWL WIKI TABLE
         $allTable = $crawler->filterXPath('//table[contains(@class,"wikitable")]//tr');
@@ -36,7 +37,6 @@ class NeckCrawler
                 preg_match('/\\n\\n\\n/', $node->textContent)
             ) {
                 $nodes[] = trim(preg_replace('/\\n\\n\\n/', PHP_EOL . PHP_EOL . '—' . PHP_EOL . PHP_EOL, $node->textContent));
-                //dd($node->textContent);
             } else {
                 $nodes[] = trim($node->textContent);
             }
