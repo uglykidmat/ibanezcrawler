@@ -2,6 +2,8 @@
 
 namespace App\Crawler;
 
+use App\Entity\Neck;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -9,8 +11,10 @@ class NeckCrawler
 {
     public function __construct(
         public HttpClientInterface $client,
+        private EntityManagerInterface $entityManager
     ) {
         $this->client = $client;
+        $this->entityManager = $entityManager;
     }
 
     public function crawlGuitarNecks(): array
@@ -56,7 +60,7 @@ class NeckCrawler
         foreach ($guitarNecks as $key => &$neck) {
             //__remove [links]
             $neck[0] = preg_replace('/\[\d+\]/', '', $neck[0]);
-
+            $neck[1] = preg_replace('/\[\d+\]/', '', $neck[1]);
             if (preg_match('/\d{4}-\d{4}|(?<!\W)(?<!\w)\d{4}/', $neck[0])) {
                 array_unshift($neck, $guitarNecks[$key - 1][0]);
             }
@@ -64,12 +68,51 @@ class NeckCrawler
         unset($neck);
 
         //____________________MERGE WITH TITLES
-        foreach ($guitarNecks as $neck) {
+
+        //____________________MERGE WITH TITLES
+        foreach ($guitarNecks as $i => &$neck) {
             $finalNecks[] = array_combine($dataTitles, $neck);
         }
 
         file_put_contents(__DIR__ . '/../../public/data/necks.json', json_encode($finalNecks, JSON_PRETTY_PRINT));
 
         return $finalNecks;
+    }
+
+    public function addNecksToDb(): int
+    {
+        $count = 0;
+        $necks = json_decode(file_get_contents(__DIR__ . '/../../public/data/necks.json'), true);
+        foreach ($necks as $neck) {
+            $neckEntity = new Neck();
+            $neckEntity->setType($neck['Neck type'])
+                ->setYears($neck['Years'])
+                ->setScaleLength($neck['Scale length'])
+                ->setWidthAtNut($neck['Width at nut'])
+                ->setWidthAtLastFret($neck['Width at last fret'])
+                ->setThicknessAt1stFret($neck['Thickness at 1st fret'])
+                ->setThicknessAt12thFret($neck['Thickness at 12th fret'])
+                ->setRadius($neck['Radius']);
+
+            $this->entityManager->persist($neckEntity);
+            $count++;
+        }
+        $this->entityManager->flush();
+
+        return $count;
+    }
+
+    public function purgeGuitarNecks(): int
+    {
+        $count = 0;
+        $neckRepository = $this->entityManager->getRepository(Neck::class);
+
+        foreach ($neckRepository->findAll() as $neck) {
+            $this->entityManager->remove($neck);
+            $count++;
+        }
+        $this->entityManager->flush();
+
+        return $count;
     }
 }
