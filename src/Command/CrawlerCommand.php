@@ -37,16 +37,17 @@ class CrawlerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $model = strtoupper($input->getArgument('model'));
+        $model = $input->getArgument('model');
+        $model = strlen($model) > 3 ? ucfirst($model) : strtoupper($model);
 
-        $io->text('🕷️ Parsing 🕷️ model ' . $model . ' ...');
+        $io->note('🕷️  Parsing 🕷️  model ' . $model . ' ...');
 
         $modelCategoryResult = $this->ibanezCrawler->crawlGuitarCategory($model);
 
         file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT));
 
         $io->success([
-            '🕸️ Crawl results ! 🕸️ See JSON file in public/data'
+            '🕸️  Crawl results ! 🕸️  See JSON file in public/data/'
         ]);
 
         return Command::SUCCESS;
