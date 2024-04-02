@@ -2,13 +2,18 @@
 
 namespace App\Crawler;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GuitarCrawler
 {
+
     public function __construct(
         public HttpClientInterface $client,
+        private LoggerInterface $logger
+
     ) {
         $this->client = $client->withOptions([]);
     }
@@ -20,6 +25,8 @@ class GuitarCrawler
         } else {
             $url = $nextPage;
         }
+
+        echo ' 🎸 Esta partita por las URLas -> ', $url, ' ! Madre mia !', PHP_EOL;
 
         $response = $this->client->request('GET', $url)->getContent();
 
@@ -44,6 +51,8 @@ class GuitarCrawler
         if ($nextPageURL = $crawler->filterXPath('//div[@class="category-page__pagination"]//a[contains(@class,"category-page__pagination-next")]/@href')->getNode(0)) {
             return $this->crawlGuitarCategory(null, $nextPageURL->textContent, $allGuitarsOfPage);
         }
+
+        echo PHP_EOL;
 
         return $allGuitarsOfPage;
     }
@@ -83,7 +92,7 @@ class GuitarCrawler
         $electronicsAndStringsSpecsValues = [];
 
         foreach ($details as $detail) {
-            if (preg_match('/(.*):(.*)/', $detail->textContent, $matches)) {
+            if (preg_match('/(\w+\s\w+):(.*)/', $detail->textContent, $matches)) {
                 $detailsKeys[] = $matches[1];
                 $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -91,7 +100,7 @@ class GuitarCrawler
         $details = array_combine($detailsKeys, $detailsValues);
 
         foreach ($bodySpecs as $bodySpec) {
-            if (preg_match('/(.*):(.*)/', $bodySpec->textContent, $matches)) {
+            if (preg_match('/(\w+\s\w+):(.*)/', $bodySpec->textContent, $matches)) {
                 $bodySpecsKeys[] = $matches[1];
                 $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -99,7 +108,7 @@ class GuitarCrawler
         $bodySpecs = array_combine($bodySpecsKeys, $bodySpecsValues);
 
         foreach ($neckSpecs as $neckSpec) {
-            if (preg_match('/(.*):(.*)/', $neckSpec->textContent, $matches)) {
+            if (preg_match('/(\w+\s\w+):(.*)/', $neckSpec->textContent, $matches)) {
                 $neckSpecsKeys[] = $matches[1];
                 $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -107,12 +116,26 @@ class GuitarCrawler
         $neckSpecs = array_combine($neckSpecsKeys, $neckSpecsValues);
 
         foreach ($electronicsAndStringsSpecs as $electronicsAndStringsSpec) {
-            if (preg_match('/(.*):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
+            if (preg_match('/(\w+\s\w+):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
                 $electronicsAndStringsSpecsKeys[] = $matches[1];
                 $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
         }
         $electronicsAndStringsSpecs = array_combine($electronicsAndStringsSpecsKeys, $electronicsAndStringsSpecsValues);
+
+        //____________________CRAWL-LOG!
+        //$logger->emergency('HOULALALA');
+        // $this->logger->info('About to find a happy message!');
+        // $this->logger->info('About to find a happy message!');
+        // $this->logger->notice('notice ?');
+        // $this->logger->warning('warning ?');
+        // $this->logger->error('error ?');
+        // $this->logger->debug('debug ?');
+        // $this->logger->info('info ?');
+        // $this->logger->emergency('emergency ?');
+        //$this->logger->log('heu', ...$details);
+        echo ' ✅ Finito el traitemento de los modelos -> ', $model, ' ! Ayyyy caramba !', PHP_EOL;
+        //dd($model);
 
         //____________________CRAWL-OUTPUT
         return [
