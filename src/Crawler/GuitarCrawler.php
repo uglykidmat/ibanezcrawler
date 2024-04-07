@@ -4,7 +4,6 @@ namespace App\Crawler;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class GuitarCrawler
@@ -124,18 +123,7 @@ class GuitarCrawler
         $electronicsAndStringsSpecs = array_combine($electronicsAndStringsSpecsKeys, $electronicsAndStringsSpecsValues);
 
         //____________________CRAWL-LOG!
-        //$logger->emergency('HOULALALA');
-        // $this->logger->info('About to find a happy message!');
-        // $this->logger->info('About to find a happy message!');
-        // $this->logger->notice('notice ?');
-        // $this->logger->warning('warning ?');
-        // $this->logger->error('error ?');
-        // $this->logger->debug('debug ?');
-        // $this->logger->info('info ?');
-        // $this->logger->emergency('emergency ?');
-        //$this->logger->log('heu', ...$details);
         echo ' ✅ Finito el traitemento de los modelos -> ', $model, ' ! Ayyyy caramba !', PHP_EOL;
-        //dd($model);
 
         //____________________CRAWL-OUTPUT
         return [
