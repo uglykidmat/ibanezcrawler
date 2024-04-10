@@ -20,22 +20,22 @@ class Guitar
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $modelname = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $soldin = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $madein = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $bodytype = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $bodymaterial = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $neckjoint = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -44,13 +44,13 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $hardwarecolor = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $necktype = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $neckmaterial = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $scalelength = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -62,7 +62,7 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $machineheads = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $pickupconfiguration = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -79,6 +79,9 @@ class Guitar
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $factorytuning = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $strapbuttons = null;
 
     public function getId(): ?int
     {
@@ -345,6 +348,18 @@ class Guitar
     public function setFactorytuning(?string $factorytuning): static
     {
         $this->factorytuning = $factorytuning;
+
+        return $this;
+    }
+
+    public function getStrapbuttons(): ?string
+    {
+        return $this->strapbuttons;
+    }
+
+    public function setStrapbuttons(?string $strapbuttons): static
+    {
+        $this->strapbuttons = $strapbuttons;
 
         return $this;
     }
