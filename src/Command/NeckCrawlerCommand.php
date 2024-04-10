@@ -31,7 +31,7 @@ class NeckCrawlerCommand extends Command
             InputArgument::REQUIRED,
             'The funxion to execute.',
             null,
-            ['crawl', 'addtodb', 'purgedb']
+            ['crawl', 'addtodb', 'purgefromdb']
         );
         $this->setHelp('funxion to execute by the neck crawler.');
     }
@@ -50,7 +50,7 @@ class NeckCrawlerCommand extends Command
             case 'addtodb':
                 $nbProcessed = $this->neckCrawler->addNecksToDb();
                 break;
-            case 'purgedb':
+            case 'purgefromdb':
                 $nbProcessed = $this->neckCrawler->purgeGuitarNecks();
                 break;
             default:
