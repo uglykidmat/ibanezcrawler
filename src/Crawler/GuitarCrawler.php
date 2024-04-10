@@ -2,7 +2,8 @@
 
 namespace App\Crawler;
 
-use Psr\Log\LoggerInterface;
+use App\Entity\Guitar;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -11,10 +12,10 @@ class GuitarCrawler
 
     public function __construct(
         public HttpClientInterface $client,
-        private LoggerInterface $logger
-
+        private EntityManagerInterface $entityManager
     ) {
         $this->client = $client->withOptions([]);
+        $this->entityManager = $entityManager;
     }
 
     public function crawlGuitarCategory(string $serie = null, string $nextPage = null, array $allGuitarsOfPage = null): array
@@ -91,7 +92,13 @@ class GuitarCrawler
         $electronicsAndStringsSpecsValues = [];
 
         foreach ($details as $detail) {
-            if (preg_match('/(\w+\s\w+):(.*)/', $detail->textContent, $matches)) {
+            if (preg_match('/(\w+\(\w+\)):(.*)/', $detail->textContent, $matches)) {
+                $detailsKeys[] = $matches[1];
+                $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+):(.*)/', $detail->textContent, $matches)) {
+                $detailsKeys[] = $matches[1];
+                $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+\s\w+):(.*)/', $detail->textContent, $matches)) {
                 $detailsKeys[] = $matches[1];
                 $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -99,7 +106,13 @@ class GuitarCrawler
         $details = array_combine($detailsKeys, $detailsValues);
 
         foreach ($bodySpecs as $bodySpec) {
-            if (preg_match('/(\w+\s\w+):(.*)/', $bodySpec->textContent, $matches)) {
+            if (preg_match('/(\w+\(\w+\)):(.*)/', $bodySpec->textContent, $matches)) {
+                $bodySpecsKeys[] = $matches[1];
+                $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+):(.*)/', $bodySpec->textContent, $matches)) {
+                $bodySpecsKeys[] = $matches[1];
+                $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+\s\w+):(.*)/', $bodySpec->textContent, $matches)) {
                 $bodySpecsKeys[] = $matches[1];
                 $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -107,7 +120,13 @@ class GuitarCrawler
         $bodySpecs = array_combine($bodySpecsKeys, $bodySpecsValues);
 
         foreach ($neckSpecs as $neckSpec) {
-            if (preg_match('/(\w+\s\w+):(.*)/', $neckSpec->textContent, $matches)) {
+            if (preg_match('/(\w+\(\w+\)):(.*)/', $neckSpec->textContent, $matches)) {
+                $neckSpecsKeys[] = $matches[1];
+                $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+):(.*)/', $neckSpec->textContent, $matches)) {
+                $neckSpecsKeys[] = $matches[1];
+                $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+\s\w+):(.*)/', $neckSpec->textContent, $matches)) {
                 $neckSpecsKeys[] = $matches[1];
                 $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -115,7 +134,13 @@ class GuitarCrawler
         $neckSpecs = array_combine($neckSpecsKeys, $neckSpecsValues);
 
         foreach ($electronicsAndStringsSpecs as $electronicsAndStringsSpec) {
-            if (preg_match('/(\w+\s\w+):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
+            if (preg_match('/(\w+\(\w+\)):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
+                $electronicsAndStringsSpecsKeys[] = $matches[1];
+                $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
+                $electronicsAndStringsSpecsKeys[] = $matches[1];
+                $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+\s\w+):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
                 $electronicsAndStringsSpecsKeys[] = $matches[1];
                 $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -134,5 +159,117 @@ class GuitarCrawler
             'neck' => $neckSpecs,
             'electronicsandstrings' => $electronicsAndStringsSpecs
         ];
+    }
+
+
+    public function addGuitarsToDb(string $model): int
+    {
+        $count = 0;
+        $guitars = json_decode(file_get_contents(__DIR__ . '/../../public/data/' . $model . '-models.json'), true);
+
+        $guitarEntity = new Guitar();
+
+        foreach ($guitars as $guitar) {
+            $queryStringToEval = '$guitarEntity';
+            foreach ($guitar as $key => $info) {
+                if (is_iterable($guitar[$key])) {
+                    foreach ($guitar[$key] as $key2 => $info2) {
+                        $queryStringToEval .=
+                            '->set' .
+                            ucfirst(trim(str_replace(' ', '', (string)$key2))) .
+                            '($guitar["' .
+                            $key .
+                            '"]["' .
+                            $key2 .
+                            '"])';
+                        if ($key == '7tremolo2010' || $key2 == '7tremolo2010') {
+                            dd($guitar);
+                        }
+                    }
+                } else {
+                    $queryStringToEval .=
+                        '->set' .
+                        ucfirst(trim(str_replace(' ', '', (string)$key))) .
+                        '($guitar["' .
+                        $key .
+                        '"])';
+                }
+                if ($key == '7tremolo2010') {
+                    dd($guitar);
+                }
+            }
+            $queryStringToEval .= ';';
+
+            //___________WOAH DANGEROUS
+            //dd($queryStringToEval);
+
+            eval($queryStringToEval);
+
+
+            // $guitarEntity
+            //     ->setModel($guitar['model'])
+            //     ->setDescription($guitar['description'])
+            //     ->setMadein($guitar['details']['Made in'])
+            //     ->setBodytype($guitar['body']['Body type'])
+            //     ->setBodymaterial($guitar['body']['Body material'])
+            //     ->setNeckjoint($guitar['body']['Neck joint'])
+            //     ->setHardwarecolor($guitar['body']['Hardware color'])
+            //     ->setNecktype($guitar['neck']['Neck type'])
+            //     ->setNeckmaterial($guitar['neck']['Neck material'])
+            //     ->setFingerboardmaterial($guitar['neck']['Fingerboard material'])
+            //     ->setPickupconfiguration($guitar['electronicsandstrings']['Pickup configuration'])
+            //     ->setBridgepickup($guitar['electronicsandstrings']['Bridge pickup']);
+
+            // if (isset($guitar['details']['Model name'])) {
+            //     $guitarEntity->setModelname($guitar['details']['Model name']);
+            // }
+            // if (isset($guitar['electronicsandstrings']['Neck pickup'])) {
+            //     $guitarEntity->setNeckpickup($guitar['electronicsandstrings']['Neck pickup']);
+            // }
+            // if (isset($guitar['electronicsandstrings']['Neck pickup'])) {
+            //     $guitarEntity->setNeckpickup($guitar['electronicsandstrings']['Neck pickup']);
+            // }
+            // if (isset($guitar['details']['Sold in'])) {
+            //     $guitarEntity->setSoldin($guitar['details']['Sold in']);
+            // }
+            // if (isset($guitar['neck']['Fingerboard inlays'])) {
+            //     $guitarEntity->setFingerboardinlays($guitar['neck']['Fingerboard inlays']);
+            // }
+            // if (isset($guitar['neck']['Machine heads'])) {
+            //     $guitarEntity->setMachineheads($guitar['neck']['Machine heads']);
+            // }
+            // if (isset($guitar['electronicsandstrings']['Output jack'])) {
+            //     $guitarEntity->setOutputjack($guitar['electronicsandstrings']['Output jack']);
+            // }
+            // if (isset($guitar['electronicsandstrings']['Middle pickup'])) {
+            //     $guitarEntity->setMiddlepickup($guitar['electronicsandstrings']['Middle pickup']);
+            // }
+            // if (isset($guitar['electronicsandstrings']['Factory tuning'])) {
+            //     $guitarEntity->setFactorytuning($guitar['electronicsandstrings']['Factory tuning']);
+            // }
+            // if (isset($guitar['electronicsandstrings']['Factory tuning'])) {
+            //     $guitarEntity->setFactorytuning($guitar['electronicsandstrings']['Factory tuning']);
+            // }
+            //dd($guitarEntity);
+            $this->entityManager->persist($guitarEntity);
+            $count++;
+        }
+        $this->entityManager->flush();
+
+        return $count;
+    }
+
+    public function purgeGuitars(string $model): int
+    {
+        $count = 0;
+        $neckRepository = $this->entityManager->getRepository(Guitar::class);
+
+        foreach ($neckRepository->findByModel($model) as $guitar) {
+            $this->entityManager->remove($guitar);
+            $count++;
+        }
+        $this->entityManager->flush();
+
+        return $count;
     }
 }
