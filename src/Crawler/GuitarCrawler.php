@@ -77,75 +77,10 @@ class GuitarCrawler
         }
 
         //____________________CRAWL-DETAILS
-        $details = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[1]//tr');
-        $bodySpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[1]/table/tbody//td');
-        $neckSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[2]/table/tbody//td');
-        $electronicsAndStringsSpecs = $crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[3]/table/tbody//td');
-
-        $detailsKeys = [];
-        $detailsValues = [];
-        $bodySpecsKeys = [];
-        $bodySpecsValues = [];
-        $neckSpecsKeys = [];
-        $neckSpecsValues = [];
-        $electronicsAndStringsSpecsKeys = [];
-        $electronicsAndStringsSpecsValues = [];
-
-        foreach ($details as $detail) {
-            if (preg_match('/(\w+\(\w+\)):(.*)/', $detail->textContent, $matches)) {
-                $detailsKeys[] = $matches[1];
-                $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+):(.*)/', $detail->textContent, $matches)) {
-                $detailsKeys[] = $matches[1];
-                $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+\s\w+):(.*)/', $detail->textContent, $matches)) {
-                $detailsKeys[] = $matches[1];
-                $detailsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            }
-        }
-        $details = array_combine($detailsKeys, $detailsValues);
-
-        foreach ($bodySpecs as $bodySpec) {
-            if (preg_match('/(\w+\(\w+\)):(.*)/', $bodySpec->textContent, $matches)) {
-                $bodySpecsKeys[] = $matches[1];
-                $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+):(.*)/', $bodySpec->textContent, $matches)) {
-                $bodySpecsKeys[] = $matches[1];
-                $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+\s\w+):(.*)/', $bodySpec->textContent, $matches)) {
-                $bodySpecsKeys[] = $matches[1];
-                $bodySpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            }
-        }
-        $bodySpecs = array_combine($bodySpecsKeys, $bodySpecsValues);
-
-        foreach ($neckSpecs as $neckSpec) {
-            if (preg_match('/(\w+\(\w+\)):(.*)/', $neckSpec->textContent, $matches)) {
-                $neckSpecsKeys[] = $matches[1];
-                $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+):(.*)/', $neckSpec->textContent, $matches)) {
-                $neckSpecsKeys[] = $matches[1];
-                $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+\s\w+):(.*)/', $neckSpec->textContent, $matches)) {
-                $neckSpecsKeys[] = $matches[1];
-                $neckSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            }
-        }
-        $neckSpecs = array_combine($neckSpecsKeys, $neckSpecsValues);
-
-        foreach ($electronicsAndStringsSpecs as $electronicsAndStringsSpec) {
-            if (preg_match('/(\w+\(\w+\)):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
-                $electronicsAndStringsSpecsKeys[] = $matches[1];
-                $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
-                $electronicsAndStringsSpecsKeys[] = $matches[1];
-                $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+\s\w+):(.*)/', $electronicsAndStringsSpec->textContent, $matches)) {
-                $electronicsAndStringsSpecsKeys[] = $matches[1];
-                $electronicsAndStringsSpecsValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            }
-        }
-        $electronicsAndStringsSpecs = array_combine($electronicsAndStringsSpecsKeys, $electronicsAndStringsSpecsValues);
+        $details = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[1]//tr'));
+        $bodySpecs = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[1]/table/tbody//td'));
+        $neckSpecs = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[2]/table/tbody//td'));
+        $electronicsAndStringsSpecs = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[3]/table/tbody//td'));
 
         //____________________CRAWL-LOG!
         echo ' ✅ Finito el traitemento de los modelos -> ', $model, ' ! Ayyyy caramba !', PHP_EOL;
@@ -159,6 +94,26 @@ class GuitarCrawler
             'neck' => $neckSpecs,
             'electronicsandstrings' => $electronicsAndStringsSpecs
         ];
+    }
+
+    private function parseAndFuseData(Crawler $crawledData): array
+    {
+        $dataKeys = [];
+        $dataValues = [];
+
+        foreach ($crawledData as $data) {
+            if (preg_match('/(\w+\(\w+\)):(.*)/', $data->textContent, $matches)) {
+                $dataKeys[] = $matches[1];
+                $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+):(.*)/', $data->textContent, $matches)) {
+                $dataKeys[] = $matches[1];
+                $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+\s\w+):(.*)/', $data->textContent, $matches)) {
+                $dataKeys[] = $matches[1];
+                $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            }
+        }
+        return array_combine($dataKeys, $dataValues);
     }
 
 
