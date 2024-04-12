@@ -122,9 +122,6 @@ class GuitarCrawler
                             '"]["' .
                             $key2 .
                             '"])';
-                        // if ($key == 'Tailpiece' || $key2 == 'Tailpiece') {
-                        //     dd($key, $key2, $guitar);
-                        // }
                     }
                 } else {
                     $queryStringToEval .=
