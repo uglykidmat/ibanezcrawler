@@ -47,25 +47,19 @@ class GuitarCrawlerCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $model = $input->getArgument('model');
         $model = strlen($model) > 3 ? ucfirst($model) : strtoupper($model);
-
-
         $funxion = $input->getArgument('funxion');
         $nbProcessed = 0;
 
         switch ($funxion) {
             case 'crawl':
                 $io->note('🕷️  Parsing 🕷️  model ' . $model . ' ...');
-
                 $modelCategoryResult = $this->guitarCrawler->crawlGuitarCategory($model);
-
                 file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT));
-
                 $io->success([
                     '🕸️  Crawl results ! 🕸️  See JSON file in public/data/'
                 ]);
 
                 return Command::SUCCESS;
-
             case 'addtodb':
                 $nbProcessed = $this->guitarCrawler->addGuitarsToDb($model);
                 $io->success([
@@ -86,13 +80,5 @@ class GuitarCrawlerCommand extends Command
         }
 
         return Command::SUCCESS;
-
-        // or return this if some error happened during the execution
-        // (it's equivalent to returning int(1))
-        // return Command::FAILURE;
-
-        // or return this to indicate incorrect command usage; e.g. invalid options
-        // or missing arguments (it's equivalent to returning int(2))
-        // return Command::INVALID
     }
 }
