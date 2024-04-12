@@ -83,6 +83,45 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $strapbuttons = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Yearsoffered = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Finishes = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Bridge = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Frets = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Nut = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Controls = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Stringgaugefactory = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Family = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $price = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Switch = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Battery = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Tailpiece = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Pickguard = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -360,6 +399,162 @@ class Guitar
     public function setStrapbuttons(?string $strapbuttons): static
     {
         $this->strapbuttons = $strapbuttons;
+
+        return $this;
+    }
+
+    public function getYearsoffered(): ?string
+    {
+        return $this->Yearsoffered;
+    }
+
+    public function setYearsoffered(?string $Yearsoffered): static
+    {
+        $this->Yearsoffered = $Yearsoffered;
+
+        return $this;
+    }
+
+    public function getFinishes(): ?string
+    {
+        return $this->Finishes;
+    }
+
+    public function setFinishes(?string $Finishes): static
+    {
+        $this->Finishes = $Finishes;
+
+        return $this;
+    }
+
+    public function getBridge(): ?string
+    {
+        return $this->Bridge;
+    }
+
+    public function setBridge(?string $Bridge): static
+    {
+        $this->Bridge = $Bridge;
+
+        return $this;
+    }
+
+    public function getFrets(): ?string
+    {
+        return $this->Frets;
+    }
+
+    public function setFrets(?string $Frets): static
+    {
+        $this->Frets = $Frets;
+
+        return $this;
+    }
+
+    public function getNut(): ?string
+    {
+        return $this->Nut;
+    }
+
+    public function setNut(?string $Nut): static
+    {
+        $this->Nut = $Nut;
+
+        return $this;
+    }
+
+    public function getControls(): ?string
+    {
+        return $this->Controls;
+    }
+
+    public function setControls(?string $Controls): static
+    {
+        $this->Controls = $Controls;
+
+        return $this;
+    }
+
+    public function getStringgaugefactory(): ?string
+    {
+        return $this->Stringgaugefactory;
+    }
+
+    public function setStringgaugefactory(?string $Stringgaugefactory): static
+    {
+        $this->Stringgaugefactory = $Stringgaugefactory;
+
+        return $this;
+    }
+
+    public function getFamily(): ?string
+    {
+        return $this->Family;
+    }
+
+    public function setFamily(string $Family): static
+    {
+        $this->Family = $Family;
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): static
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getSwitch(): ?string
+    {
+        return $this->Switch;
+    }
+
+    public function setSwitch(?string $Switch): static
+    {
+        $this->Switch = $Switch;
+
+        return $this;
+    }
+
+    public function getBattery(): ?string
+    {
+        return $this->Battery;
+    }
+
+    public function setBattery(?string $Battery): static
+    {
+        $this->Battery = $Battery;
+
+        return $this;
+    }
+
+    public function getTailpiece(): ?string
+    {
+        return $this->Tailpiece;
+    }
+
+    public function setTailpiece(?string $Tailpiece): static
+    {
+        $this->Tailpiece = $Tailpiece;
+
+        return $this;
+    }
+
+    public function getPickguard(): ?string
+    {
+        return $this->Pickguard;
+    }
+
+    public function setPickguard(?string $Pickguard): static
+    {
+        $this->Pickguard = $Pickguard;
 
         return $this;
     }
