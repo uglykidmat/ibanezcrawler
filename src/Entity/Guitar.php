@@ -53,7 +53,7 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $scalelength = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $fingerboardmaterial = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -86,7 +86,7 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Yearsoffered = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Finishes = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -98,16 +98,16 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Nut = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $Controls = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Stringgaugefactory = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Family = null;
+    private ?string $family = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $price = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -121,6 +121,18 @@ class Guitar
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Pickguard = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Dimensions = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Top = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Sides = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Electronics = null;
 
     public function getId(): ?int
     {
@@ -489,12 +501,12 @@ class Guitar
 
     public function getFamily(): ?string
     {
-        return $this->Family;
+        return $this->family;
     }
 
-    public function setFamily(string $Family): static
+    public function setFamily(string $family): static
     {
-        $this->Family = $Family;
+        $this->family = $family;
 
         return $this;
     }
@@ -555,6 +567,54 @@ class Guitar
     public function setPickguard(?string $Pickguard): static
     {
         $this->Pickguard = $Pickguard;
+
+        return $this;
+    }
+
+    public function getDimensions(): ?string
+    {
+        return $this->Dimensions;
+    }
+
+    public function setDimensions(?string $Dimensions): static
+    {
+        $this->Dimensions = $Dimensions;
+
+        return $this;
+    }
+
+    public function getTop(): ?string
+    {
+        return $this->Top;
+    }
+
+    public function setTop(?string $Top): static
+    {
+        $this->Top = $Top;
+
+        return $this;
+    }
+
+    public function getSides(): ?string
+    {
+        return $this->Sides;
+    }
+
+    public function setSides(?string $Sides): static
+    {
+        $this->Sides = $Sides;
+
+        return $this;
+    }
+
+    public function getElectronics(): ?string
+    {
+        return $this->Electronics;
+    }
+
+    public function setElectronics(?string $Electronics): static
+    {
+        $this->Electronics = $Electronics;
 
         return $this;
     }
