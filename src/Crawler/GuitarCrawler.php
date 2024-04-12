@@ -20,6 +20,7 @@ class GuitarCrawler
     public function crawlGuitarCategory(string $serie = null, string $nextPage = null, array $allGuitarsOfPage = null): array
     {
         if (!$nextPage) {
+            $serie = str_replace(' ', '_', $serie);
             $url = 'https://ibanez.fandom.com/wiki/Category:' . $serie . '_models';
         } else {
             $url = $nextPage;
@@ -87,7 +88,7 @@ class GuitarCrawler
         $dataKeys = [];
         $dataValues = [];
         foreach ($crawledData as $data) {
-            if (preg_match('/(\w+\s?\w+\s?\(?\w+\)?\s?\w*):(.*)/', $data->textContent, $matches)) {
+            if (preg_match('/(\w+\s?\/?\w+\s?\(?\w+\)?\s?\w*):(.*)/', $data->textContent, $matches)) {
                 $dataKeys[] = $matches[1];
                 $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
             } else if (preg_match('/(\w+\(\w+\)):(.*)/', $data->textContent, $matches)) {
