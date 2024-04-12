@@ -25,33 +25,25 @@ class GuitarCrawler
         } else {
             $url = $nextPage;
         }
-
         echo ' 🎸 Esta partita por las URLas -> ', $url, ' ! Madre mia !', PHP_EOL;
-
         $response = $this->client->request('GET', $url)->getContent();
-
         //____________________CRAWLER
         $crawler = new Crawler($response);
-
         //____________________CRAWL-LINKS
         $categoryCrawlResult = $crawler->filterXPath('//div[@class="category-page__members"]//li/a[@class="category-page__member-link"][not(contains(@href,"Category"))]/@href');
-
         //____________________BUILD-MODELS_LIST_URLS
         $modelsURLs = [];
         foreach ($categoryCrawlResult as $key => $modelSubpageURL) {
             $modelsURLs[] = 'https://ibanez.fandom.com' . $modelSubpageURL->textContent;
         }
-
         //____________________CRAWL-ONE-BY-ONE
         foreach ($modelsURLs as $modelURL) {
             $allGuitarsOfPage[] = $this->crawlOneGuitar($modelURL);
         }
-
         //____________________Recursive crawl on next pages
         if ($nextPageURL = $crawler->filterXPath('//div[@class="category-page__pagination"]//a[contains(@class,"category-page__pagination-next")]/@href')->getNode(0)) {
             return $this->crawlGuitarCategory(null, $nextPageURL->textContent, $allGuitarsOfPage);
         }
-
         echo PHP_EOL;
 
         return $allGuitarsOfPage;
@@ -81,7 +73,7 @@ class GuitarCrawler
         $bodySpecs = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[1]/table/tbody//td'));
         $neckSpecs = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[2]/table/tbody//td'));
         $electronicsAndStringsSpecs = $this->parseAndFuseData($crawler->filterXPath('//div[@class="purplebox"]/table/tbody/tr[2]/td[3]/table/tbody//td'));
-
+        //dd($details);
         //____________________CRAWL-LOG!
         echo ' ✅ Finito el traitemento de los modelos -> ', $model, ' ! Ayyyy caramba !', PHP_EOL;
 
@@ -102,13 +94,16 @@ class GuitarCrawler
         $dataValues = [];
 
         foreach ($crawledData as $data) {
-            if (preg_match('/(\w+\(\w+\)):(.*)/', $data->textContent, $matches)) {
+            if (preg_match('/(\w+\s?\w+\s?\(?\w+\)?\s?\w*):(.*)/', $data->textContent, $matches)) {
                 $dataKeys[] = $matches[1];
                 $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
-            } else if (preg_match('/(\w+):(.*)/', $data->textContent, $matches)) {
+            } else if (preg_match('/(\w+\(\w+\)):(.*)/', $data->textContent, $matches)) {
                 $dataKeys[] = $matches[1];
                 $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
             } else if (preg_match('/(\w+\s\w+):(.*)/', $data->textContent, $matches)) {
+                $dataKeys[] = $matches[1];
+                $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
+            } else if (preg_match('/(\w+):(.*)/', $data->textContent, $matches)) {
                 $dataKeys[] = $matches[1];
                 $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
             }
@@ -116,30 +111,28 @@ class GuitarCrawler
         return array_combine($dataKeys, $dataValues);
     }
 
-
     public function addGuitarsToDb(string $model): int
     {
         $count = 0;
         $guitars = json_decode(file_get_contents(__DIR__ . '/../../public/data/' . $model . '-models.json'), true);
 
-        $guitarEntity = new Guitar();
-
         foreach ($guitars as $guitar) {
+            $guitarEntity = new Guitar();
             $queryStringToEval = '$guitarEntity';
             foreach ($guitar as $key => $info) {
                 if (is_iterable($guitar[$key])) {
                     foreach ($guitar[$key] as $key2 => $info2) {
                         $queryStringToEval .=
                             '->set' .
-                            ucfirst(trim(str_replace(' ', '', (string)$key2))) .
+                            ucfirst(trim(str_replace([' ', '(', ')'], '', (string)$key2))) .
                             '($guitar["' .
                             $key .
                             '"]["' .
                             $key2 .
                             '"])';
-                        if ($key == '7tremolo2010' || $key2 == '7tremolo2010') {
-                            dd($guitar);
-                        }
+                        // if ($key == 'Tailpiece' || $key2 == 'Tailpiece') {
+                        //     dd($key, $key2, $guitar);
+                        // }
                     }
                 } else {
                     $queryStringToEval .=
@@ -149,63 +142,13 @@ class GuitarCrawler
                         $key .
                         '"])';
                 }
-                if ($key == '7tremolo2010') {
-                    dd($guitar);
-                }
             }
             $queryStringToEval .= ';';
 
             //___________WOAH DANGEROUS
-            //dd($queryStringToEval);
-
             eval($queryStringToEval);
+            $guitarEntity->setFamily($model);
 
-
-            // $guitarEntity
-            //     ->setModel($guitar['model'])
-            //     ->setDescription($guitar['description'])
-            //     ->setMadein($guitar['details']['Made in'])
-            //     ->setBodytype($guitar['body']['Body type'])
-            //     ->setBodymaterial($guitar['body']['Body material'])
-            //     ->setNeckjoint($guitar['body']['Neck joint'])
-            //     ->setHardwarecolor($guitar['body']['Hardware color'])
-            //     ->setNecktype($guitar['neck']['Neck type'])
-            //     ->setNeckmaterial($guitar['neck']['Neck material'])
-            //     ->setFingerboardmaterial($guitar['neck']['Fingerboard material'])
-            //     ->setPickupconfiguration($guitar['electronicsandstrings']['Pickup configuration'])
-            //     ->setBridgepickup($guitar['electronicsandstrings']['Bridge pickup']);
-
-            // if (isset($guitar['details']['Model name'])) {
-            //     $guitarEntity->setModelname($guitar['details']['Model name']);
-            // }
-            // if (isset($guitar['electronicsandstrings']['Neck pickup'])) {
-            //     $guitarEntity->setNeckpickup($guitar['electronicsandstrings']['Neck pickup']);
-            // }
-            // if (isset($guitar['electronicsandstrings']['Neck pickup'])) {
-            //     $guitarEntity->setNeckpickup($guitar['electronicsandstrings']['Neck pickup']);
-            // }
-            // if (isset($guitar['details']['Sold in'])) {
-            //     $guitarEntity->setSoldin($guitar['details']['Sold in']);
-            // }
-            // if (isset($guitar['neck']['Fingerboard inlays'])) {
-            //     $guitarEntity->setFingerboardinlays($guitar['neck']['Fingerboard inlays']);
-            // }
-            // if (isset($guitar['neck']['Machine heads'])) {
-            //     $guitarEntity->setMachineheads($guitar['neck']['Machine heads']);
-            // }
-            // if (isset($guitar['electronicsandstrings']['Output jack'])) {
-            //     $guitarEntity->setOutputjack($guitar['electronicsandstrings']['Output jack']);
-            // }
-            // if (isset($guitar['electronicsandstrings']['Middle pickup'])) {
-            //     $guitarEntity->setMiddlepickup($guitar['electronicsandstrings']['Middle pickup']);
-            // }
-            // if (isset($guitar['electronicsandstrings']['Factory tuning'])) {
-            //     $guitarEntity->setFactorytuning($guitar['electronicsandstrings']['Factory tuning']);
-            // }
-            // if (isset($guitar['electronicsandstrings']['Factory tuning'])) {
-            //     $guitarEntity->setFactorytuning($guitar['electronicsandstrings']['Factory tuning']);
-            // }
-            //dd($guitarEntity);
             $this->entityManager->persist($guitarEntity);
             $count++;
         }
@@ -214,12 +157,12 @@ class GuitarCrawler
         return $count;
     }
 
-    public function purgeGuitars(string $model): int
+    public function purgeGuitars(string $family): int
     {
         $count = 0;
         $neckRepository = $this->entityManager->getRepository(Guitar::class);
 
-        foreach ($neckRepository->findByModel($model) as $guitar) {
+        foreach ($neckRepository->findByFamily($family) as $guitar) {
             $this->entityManager->remove($guitar);
             $count++;
         }
