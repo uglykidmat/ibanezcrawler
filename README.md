@@ -34,5 +34,5 @@ Commands :
 If someone ever uses a browser
 
 * Crawl one guitar (example/test) : /crawler/guitar
-* Crawl guitars by model (S, RG, etc) : /crawler/guitars/{serie}
+* Crawl guitars by model (S, RG, Prestige, etc) : /crawler/guitars/{serie}
 * Crawl guitar necks : /crawler/guitarnecks
