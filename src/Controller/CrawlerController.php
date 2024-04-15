@@ -25,30 +25,28 @@ class CrawlerController extends AbstractController
                 'URLs' =>
                 [
                     'Crawl one guitar (example/test)' => '/crawler/guitar',
-                    'Crawl guitars by model (S, RG, etc)' => '/crawler/guitars/{serie}',
+                    'Crawl guitars by model (S, RG, Prestige, etc)' => '/crawler/guitars/{serie}',
                     'Crawl guitar necks' => '/crawler/guitarnecks',
                 ]
             ]
         );
     }
 
-    #[Route('/crawler/guitar', name: 'app_crawler')]
-    public function getOneGuitar()
-    {
-        $url = 'https://ibanez.fandom.com/wiki/GRG270B';
-
-        return $this->json(
-            $this->guitarCrawler->crawlOneGuitar($url)
-        );
-    }
-
     #[Route('/crawler/guitars/{serie}', name: 'crawler_guitars_by_serie')]
     public function getBySerie(string $serie): JsonResponse
     {
+        ob_start();
         set_time_limit(0);
-        return $this->json(
-            $this->guitarCrawler->crawlGuitarCategory($serie)
-        );
+        $serie = strlen($serie) > 3 ? ucfirst($serie) : strtoupper($serie);
+        $SerieResponse = $this->guitarCrawler->crawlGuitarCategory($serie);
+        if (ob_end_clean()) {
+            return $this->json(
+                [
+                    'info' => 'Here are the results, but the JSON file has not been created/updated. Use app:guitarcrawler [Serie] for this.',
+                    'results' => $SerieResponse
+                ]
+            );
+        }
     }
 
     #[Route('/crawler/guitarnecks', name: 'crawler_guitar_necks')]
