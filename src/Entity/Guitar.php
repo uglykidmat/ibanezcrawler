@@ -21,7 +21,7 @@ class Guitar
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $modelname = null;
+    private ?string $modelName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $soldin = null;
@@ -168,12 +168,12 @@ class Guitar
 
     public function getModelname(): ?string
     {
-        return $this->modelname;
+        return $this->modelName;
     }
 
-    public function setModelname(string $modelname): static
+    public function setModelname(string $modelName): static
     {
-        $this->modelname = $modelname;
+        $this->modelName = $modelName;
 
         return $this;
     }
