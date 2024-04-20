@@ -91,6 +91,16 @@ class GuitarCrawler
             if (preg_match('/(\w+\s?\/?\w+\s?\(?\w+\)?\s?\w*):(.*)/', $data->textContent, $matches)) {
                 $dataKeys[] = $matches[1];
                 $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
+                if ($dataKeys[0] == 'Model name') {
+                    if (
+                        preg_match('/(\(.*\))/', $dataValues[0], $matches)
+                    ) {
+                        $dataValues[0] = trim(preg_replace('/(\(.*\))/', '', $dataValues[0]));
+                        $extraParenthesisInfo = substr($matches[0], 1, strlen($matches[0]) - 2);
+                        $dataKeys[] = 'ExtraParenthesisInfo';
+                        $dataValues[] = $extraParenthesisInfo;
+                    }
+                }
             } else if (preg_match('/(\w+\(\w+\)):(.*)/', $data->textContent, $matches)) {
                 $dataKeys[] = $matches[1];
                 $dataValues[] = trim(str_replace('\n', ' ', $matches[2]));
