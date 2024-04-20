@@ -22,11 +22,16 @@ class CrawlerController extends AbstractController
 
         return $this->json(
             [
-                'URLs' =>
+                'Crawler URLs' =>
                 [
                     'Crawl one guitar (example/test)' => '/crawler/guitar',
                     'Crawl guitars by model (S, RG, Prestige, etc)' => '/crawler/guitars/{serie}',
                     'Crawl guitar necks' => '/crawler/guitarnecks',
+                ],
+                'Info URLs' =>
+                [
+                    'See a specific model' => '/guitar/{model}',
+                    'See a specific family (S, RG, Prestige, etc)' => '/guitars/{serie}',
                 ]
             ]
         );
