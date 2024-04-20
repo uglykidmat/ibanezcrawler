@@ -134,6 +134,9 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Electronics = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $extraParenthesisInfo = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -615,6 +618,18 @@ class Guitar
     public function setElectronics(?string $Electronics): static
     {
         $this->Electronics = $Electronics;
+
+        return $this;
+    }
+
+    public function getExtraParenthesisInfo(): ?string
+    {
+        return $this->extraParenthesisInfo;
+    }
+
+    public function setExtraParenthesisInfo(?string $extraParenthesisInfo): static
+    {
+        $this->extraParenthesisInfo = $extraParenthesisInfo;
 
         return $this;
     }
