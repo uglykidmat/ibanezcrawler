@@ -29,6 +29,7 @@ class GuitarController extends AbstractController
                     'neck type' => $guitar->getNecktype(),
                     'neck joint' => $guitar->getNeckjoint(),
                     'finishes' => $guitar->getFinishes(),
+                    'years offered' => $guitar->getYearsoffered(),
                 ];
             }
 
@@ -48,7 +49,7 @@ class GuitarController extends AbstractController
     public function getGuitarModel(string $model): JsonResponse
     {
         $response = [];
-        if ($guitarByModel = $this->entityManager->getRepository(Guitar::class)->findByModel($model)) {
+        if ($guitarByModel = $this->entityManager->getRepository(Guitar::class)->findByModelName($model)) {
             foreach ($guitarByModel as $guitar) {
                 $response[] = [
                     'model' => $guitar->getModel(),
@@ -57,6 +58,8 @@ class GuitarController extends AbstractController
                     'neck type' => $guitar->getNecktype(),
                     'neck joint' => $guitar->getNeckjoint(),
                     'finishes' => $guitar->getFinishes(),
+                    'years offered' => $guitar->getYearsoffered(),
+                    'extra info' => $guitar->getExtraParenthesisInfo(),
                 ];
             }
 
