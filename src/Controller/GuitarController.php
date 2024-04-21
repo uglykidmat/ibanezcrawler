@@ -22,14 +22,17 @@ class GuitarController extends AbstractController
         if ($allGuitarsByFamily = $this->entityManager->getRepository(Guitar::class)->findByFamily($family)) {
             $response = [];
             foreach ($allGuitarsByFamily as $guitar) {
+                preg_match_all('/[A-Z]{2}/', $guitar->getFinishes(), $finishesCodes);
                 $response[] = [
-                    'model' => $guitar->getModel(),
+                    'model name' => $guitar->getModelName(),
                     'body type' => $guitar->getBodytype(),
                     'body material' => $guitar->getBodymaterial(),
                     'neck type' => $guitar->getNecktype(),
                     'neck joint' => $guitar->getNeckjoint(),
                     'finishes' => $guitar->getFinishes(),
+                    'finishes codes' => $finishesCodes[0],
                     'years offered' => $guitar->getYearsoffered(),
+                    'extra info' => $guitar->getExtraParenthesisInfo(),
                 ];
             }
 
@@ -51,13 +54,15 @@ class GuitarController extends AbstractController
         $response = [];
         if ($guitarByModel = $this->entityManager->getRepository(Guitar::class)->findByModelName($model)) {
             foreach ($guitarByModel as $guitar) {
+                preg_match_all('/[A-Z]{2}/', $guitar->getFinishes(), $finishesCodes);
                 $response[] = [
-                    'model' => $guitar->getModel(),
+                    'model name' => $guitar->getModelName(),
                     'body type' => $guitar->getBodytype(),
                     'body material' => $guitar->getBodymaterial(),
                     'neck type' => $guitar->getNecktype(),
                     'neck joint' => $guitar->getNeckjoint(),
                     'finishes' => $guitar->getFinishes(),
+                    'finishes codes' => $finishesCodes[0],
                     'years offered' => $guitar->getYearsoffered(),
                     'extra info' => $guitar->getExtraParenthesisInfo(),
                 ];
