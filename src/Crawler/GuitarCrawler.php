@@ -127,7 +127,7 @@ class GuitarCrawler
                     foreach ($guitar[$key] as $key2 => $info2) {
                         $queryStringToEval .=
                             '->set' .
-                            ucfirst(trim(str_replace([' ', '(', ')'], '', (string)$key2))) .
+                            ucfirst(trim(str_replace([' ', '(', ')'], '', (string) $key2))) .
                             '($guitar["' .
                             $key .
                             '"]["' .
@@ -137,7 +137,7 @@ class GuitarCrawler
                 } else {
                     $queryStringToEval .=
                         '->set' .
-                        ucfirst(trim(str_replace(' ', '', (string)$key))) .
+                        ucfirst(trim(str_replace(' ', '', (string) $key))) .
                         '($guitar["' .
                         $key .
                         '"])';
@@ -145,7 +145,7 @@ class GuitarCrawler
             }
             $queryStringToEval .= ';';
             //___________WOAH DANGEROUS
-            eval($queryStringToEval);
+            eval ($queryStringToEval);
             $guitarEntity->setFamily($model);
             $this->entityManager->persist($guitarEntity);
             $count++;
