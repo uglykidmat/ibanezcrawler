@@ -15,7 +15,7 @@ class GuitarController extends AbstractController
     ) {
     }
 
-    #[Route('/guitars/{family}', name: 'guitars_by_family')]
+    #[Route('/guitars/family/{family}', name: 'guitars_by_family')]
     public function getAllGuitarsByFamily(string $family): JsonResponse
     {
         $family = strlen($family) > 3 ? ucfirst($family) : strtoupper($family);
@@ -48,7 +48,7 @@ class GuitarController extends AbstractController
         }
     }
 
-    #[Route('/guitar/{model}', name: 'guitar_by_model')]
+    #[Route('/guitars/model/{model}', name: 'guitar_by_model')]
     public function getGuitarModel(string $model): JsonResponse
     {
         $response = [];

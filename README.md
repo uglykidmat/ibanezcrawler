@@ -16,7 +16,7 @@ Commands :
 * `addtodb` will parse the above file and add every entry as Guitar entities in the database.
 * `purgedb` will remove every Guitar entities from the database.
 
-`string` Model name  = "RG", "S", ...
+`string` Model name  = "RG", "S", "Prestige"...
 Will crawl a page of category type (https://ibanez.fandom.com/wiki/Category:S_models) and create a JSON file of the guitar models found, under `public/data/`.
 
 ### Necks
@@ -27,12 +27,13 @@ Commands :
 * `addtodb` will parse the above file and add every entry as Neck entities in the database.
 * `purgedb` will remove every Neck entity from the database.
 
-
-
-## Links
-
+## Crawler links
 If someone ever uses a browser
 
-* Crawl one guitar (example/test) : /crawler/guitar
-* Crawl guitars by model (S, RG, Prestige, etc) : /crawler/guitars/{serie}
-* Crawl guitar necks : /crawler/guitarnecks
+* Crawl one guitar (example/test) : `/crawler/guitar`
+* Crawl guitars by model (S, RG, Prestige, etc) : `/crawler/guitars/{serie}`
+* Crawl guitar necks : `/crawler/guitarnecks`
+
+## API endpoints
+* Get a single guitar model : `/guitars/model/{model}` ("S450", "FGM100", ...)
+* Get all guitars by family : `/guitars/family/{family}` ("S", "Prestige", ...)
