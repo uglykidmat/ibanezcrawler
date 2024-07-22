@@ -74,7 +74,7 @@ class NeckCrawler
             $finalNecks[] = array_combine($dataTitles, $neck);
         }
 
-        file_put_contents(__DIR__ . '/../../public/data/necks.json', json_encode($finalNecks, JSON_PRETTY_PRINT));
+        file_put_contents(__DIR__ . '/../../public/data/necks.json', json_encode($finalNecks, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         return $finalNecks;
     }

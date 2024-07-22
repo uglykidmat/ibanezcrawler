@@ -54,7 +54,7 @@ class GuitarCrawlerCommand extends Command
             case 'crawl':
                 $io->note('🕷️  Parsing 🕷️  model ' . $model . ' ...');
                 $modelCategoryResult = $this->guitarCrawler->crawlGuitarCategory($model);
-                file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT));
+                file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                 $io->success([
                     '🕸️  Crawl results ! 🕸️  See JSON file in public/data/'
                 ]);

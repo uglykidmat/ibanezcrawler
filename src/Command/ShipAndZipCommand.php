@@ -72,7 +72,8 @@ class ShipAndZipCommand extends Command
                 $guitar,
                 'json',
                 [
-                    'json_encode_options' => JSON_PRETTY_PRINT,
+                    'json_encode_options' =>
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
                     AbstractObjectNormalizer::SKIP_NULL_VALUES => true
                 ],
 
