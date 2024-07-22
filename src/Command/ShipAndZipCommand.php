@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 // the name of the command is what users type after "php bin/console"
 #[AsCommand(
@@ -67,7 +68,15 @@ class ShipAndZipCommand extends Command
             $nbProcessed++;
             $io->text($nbProcessed . '/' . $nbTotal . ' - 🎸 - Starting guitar ' . $guitar->getModel() . ' ...');
 
-            $jsonGuitar = $this->serializer->serialize($guitar, 'json');
+            $jsonGuitar = $this->serializer->serialize(
+                $guitar,
+                'json',
+                [
+                    'json_encode_options' => JSON_PRETTY_PRINT,
+                    AbstractObjectNormalizer::SKIP_NULL_VALUES => true
+                ],
+
+            );
 
             file_put_contents(__DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.json', $jsonGuitar);
         }
