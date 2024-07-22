@@ -9,15 +9,23 @@ Symfony 7
 ## Commands
 
 ### Guitars
-`php bin/console app:guitarcrawler {model name} {crawl|addtodb|purgefromdb}`
+#### Crawl
+`php bin/console app:guitarcrawler {serie/family name} {crawl|addtodb|purgefromdb}`
 
 Commands :
-* `crawl` will parse the guitars category and create the JSON data file `public/data/{model name}-models.json` 
+* `crawl` will parse the guitars category and create the JSON data file `public/data/{serie/family name}-models.json` 
 * `addtodb` will parse the above file and add every entry as Guitar entities in the database.
 * `purgedb` will remove every Guitar entities from the database.
 
 `string` Model name  = "RG", "S", "Prestige"...
 Will crawl a page of category type (https://ibanez.fandom.com/wiki/Category:S_models) and create a JSON file of the guitar models found, under `public/data/`.
+
+#### PDF/JSON/ZIP
+`php bin/console app:shipandzip {serie/family}`
+This command will create a folder under /public/data and fill it with ZIP files
+containing two files : PDF and JSON for every guitar model of the serie. ⚠️ It
+is required to use the above commands guitarcrawler->crawl then ->addtodb before
+using the shipandzip command, as it needs entries in the database. 
 
 ### Necks
 `php bin/console app:neckcrawler {crawl|addtodb|purgefromdb}`
