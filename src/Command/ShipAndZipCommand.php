@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Ugly\PDFMaker\FPDF;
+use Ugly\PDFMaker\tFPDF;
 
 #[AsCommand(
     name: 'app:shipandzip',
@@ -24,7 +24,7 @@ class ShipAndZipCommand extends Command
     public function __construct(
         public EntityManagerInterface $entityManager,
         public SerializerInterface $serializer,
-        public FPDF $fpdf,
+        public tFPDF $fpdf,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
@@ -70,7 +70,10 @@ class ShipAndZipCommand extends Command
 
         // PDF generic/header infos
         $this->fpdf->AddPage();
-        $this->fpdf->SetFont('Arial', 'B', 16);
+        //$this->fpdf->AddFont('Arial');
+        //$this->fpdf->SetFont('Arial', 'B', 16);
+        $this->fpdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
+        $this->fpdf->SetFont('DejaVu', '', 14);
         $this->fpdf->SetCreator('UglyKidMat');
 
         foreach ($allGuitarsFromFamily as $guitar) {
@@ -93,15 +96,16 @@ class ShipAndZipCommand extends Command
 
             // PDF file
             $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
-            $this->fpdf->Cell(40, 10, $guitar->getModel());
-            $this->fpdf->SetTitle($guitar->getModel());
+            $this->fpdf->Cell(40, 10, 'Specifications for Ibanez ' . $guitar->getModel());
+            $this->fpdf->Text(20, 10, 'Specifications for Ibanez ' . $guitar->getModel());
+
             $this->fpdf->Output(
                 'F',
                 __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
             );
 
-            dd('check PDFs !');
+            dd($this->fpdf);
 
         }
 
