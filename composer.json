@@ -36,7 +36,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\": "src/",
+            "FPDF\\": "src/FileMaker/FPDF/FPDF"
         }
     },
     "autoload-dev": {
