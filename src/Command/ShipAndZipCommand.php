@@ -12,8 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use App\FileMaker\PDFmaker;
 
-// the name of the command is what users type after "php bin/console"
 #[AsCommand(
     name: 'app:shipandzip',
     description: 'Takes a guitar serie/family (S, RG, ...) as argument, and exports a .zip file containing JSON infos and a PDF, for every model of the serie.',
@@ -22,13 +22,14 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 class ShipAndZipCommand extends Command
 {
     public function __construct(
-        //private GuitarCrawler $guitarCrawler
         public EntityManagerInterface $entityManager,
-        public SerializerInterface $serializer
+        public SerializerInterface $serializer,
+        public PDFmaker $pdfMaker,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->serializer = $serializer;
+        $this->pdfMaker = $pdfMaker;
     }
 
     protected function configure(): void
@@ -60,6 +61,8 @@ class ShipAndZipCommand extends Command
         if (!file_exists(__DIR__ . '/../../public/data/' . $family)) {
             mkdir(__DIR__ . '/../../public/data/' . $family, 0777, true);
         }
+
+        $this->pdfMaker->log();
 
         #Batch create JSON file for each guitar from the family
         $nbProcessed = 0;
