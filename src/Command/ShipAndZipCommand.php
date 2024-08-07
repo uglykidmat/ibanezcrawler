@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use App\FileMaker\PDFmaker;
+use Ugly\PDFMaker\FPDF;
 
 #[AsCommand(
     name: 'app:shipandzip',
@@ -24,12 +24,12 @@ class ShipAndZipCommand extends Command
     public function __construct(
         public EntityManagerInterface $entityManager,
         public SerializerInterface $serializer,
-        public PDFmaker $pdfMaker,
+        public FPDF $fpdf,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->serializer = $serializer;
-        $this->pdfMaker = $pdfMaker;
+        $this->fpdf = $fpdf;
     }
 
     protected function configure(): void
@@ -62,15 +62,22 @@ class ShipAndZipCommand extends Command
             mkdir(__DIR__ . '/../../public/data/' . $family, 0777, true);
         }
 
-        $this->pdfMaker->log();
+        // Batch create JSON and PDF files for each guitar from the family
 
-        #Batch create JSON file for each guitar from the family
+        // Counter
         $nbProcessed = 0;
         $nbTotal = count($allGuitarsFromFamily);
+
+        // PDF generic/header infos
+        $this->fpdf->AddPage();
+        $this->fpdf->SetFont('Arial', 'B', 16);
+        $this->fpdf->SetCreator('UglyKidMat');
+
         foreach ($allGuitarsFromFamily as $guitar) {
             $nbProcessed++;
             $io->text($nbProcessed . '/' . $nbTotal . ' - 🎸 - Starting guitar ' . $guitar->getModel() . ' ...');
 
+            // JSON file
             $jsonGuitar = $this->serializer->serialize(
                 $guitar,
                 'json',
@@ -83,6 +90,19 @@ class ShipAndZipCommand extends Command
             );
 
             file_put_contents(__DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.json', $jsonGuitar);
+
+            // PDF file
+            $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
+            $this->fpdf->Cell(40, 10, $guitar->getModel());
+            $this->fpdf->SetTitle($guitar->getModel());
+            $this->fpdf->Output(
+                'F',
+                __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
+                true
+            );
+
+            dd('check PDFs !');
+
         }
 
         $io->success([

@@ -19,8 +19,8 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-    App\FileMaker\FPDF\FPDF:
-        class: App\FileMaker\FPDF\FPDF
+    Ugly\PDFMaker\FPDF:
+        class: Ugly\PDFMaker\FPDF
         autowire: true
 
     # add more service definitions when explicit configuration is needed
