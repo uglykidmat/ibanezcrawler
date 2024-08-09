@@ -69,18 +69,23 @@ class ShipAndZipCommand extends Command
         $nbTotal = count($allGuitarsFromFamily);
 
         // PDF generic/header infos
+        $this->fpdf->SetCreator('UglyKidMat');
         $this->fpdf->AddPage();
-        //$this->fpdf->AddFont('Arial');
-        //$this->fpdf->SetFont('Arial', 'B', 16);
         $this->fpdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
         $this->fpdf->SetFont('DejaVu', '', 14);
-        $this->fpdf->SetCreator('UglyKidMat');
+        echo 'X initial : ' . $this->fpdf->GetX() . PHP_EOL;
+        echo 'Y initial : ' . $this->fpdf->GetY() . PHP_EOL;
+        $this->fpdf->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
+
+        echo 'X after image : ' . $this->fpdf->GetX() . PHP_EOL;
+        echo 'Y after image : ' . $this->fpdf->GetY() . PHP_EOL;
 
         foreach ($allGuitarsFromFamily as $guitar) {
             $nbProcessed++;
             $io->text($nbProcessed . '/' . $nbTotal . ' - 🎸 - Starting guitar ' . $guitar->getModel() . ' ...');
 
             // JSON file
+            $io->text('...creating JSON file...');
             $jsonGuitar = $this->serializer->serialize(
                 $guitar,
                 'json',
@@ -89,15 +94,30 @@ class ShipAndZipCommand extends Command
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
                     AbstractObjectNormalizer::SKIP_NULL_VALUES => true
                 ],
-
             );
 
             file_put_contents(__DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.json', $jsonGuitar);
 
             // PDF file
+            $io->text('...creating PDF file...');
             $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
-            $this->fpdf->Cell(40, 10, 'Specifications for Ibanez ' . $guitar->getModel());
-            $this->fpdf->Text(20, 10, 'Specifications for Ibanez ' . $guitar->getModel());
+
+            $this->fpdf->Cell(
+                0,
+                40,
+                'Specifications for Ibanez '
+                . $guitar->getModel(),
+                'TB',
+                2,
+                'R'
+            );
+            echo 'X after cell : ' . $this->fpdf->GetX() . PHP_EOL;
+            echo 'Y after cell : ' . $this->fpdf->GetY() . PHP_EOL;
+
+            $this->fpdf->SetFont('DejaVu', '', 10);
+            $this->fpdf->Text(40, 65, $guitar->getDescription());
+            echo 'X after text : ' . $this->fpdf->GetX() . PHP_EOL;
+            echo 'Y after text : ' . $this->fpdf->GetY() . PHP_EOL;
 
             $this->fpdf->Output(
                 'F',
@@ -105,7 +125,7 @@ class ShipAndZipCommand extends Command
                 true
             );
 
-            dd($this->fpdf);
+            dd($this->fpdf->GetX(), $this->fpdf->GetY());
 
         }
 
