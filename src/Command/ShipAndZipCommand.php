@@ -114,10 +114,28 @@ class ShipAndZipCommand extends Command
             echo 'X after cell : ' . $this->fpdf->GetX() . PHP_EOL;
             echo 'Y after cell : ' . $this->fpdf->GetY() . PHP_EOL;
 
-            $this->fpdf->SetFont('DejaVu', '', 10);
-            $this->fpdf->Text(40, 65, $guitar->getDescription());
-            echo 'X after text : ' . $this->fpdf->GetX() . PHP_EOL;
-            echo 'Y after text : ' . $this->fpdf->GetY() . PHP_EOL;
+            $this->fpdf->Ln(5);
+            $this->fpdf->SetFont('DejaVu', '', 9);
+            // $this->fpdf->Text(40, 65, $guitar->getDescription());
+            // $this->fpdf->Cell(
+            //     20,
+            //     40,
+            //     'Description : '
+            //     . $guitar->getDescription(),
+            //     0,
+            //     2,
+            //     'J'
+            // );
+
+            $this->fpdf->MultiCell(0, 5, 'Description : '
+                . $guitar->getDescription(), 'J');
+            echo 'X after multicell description : ' . $this->fpdf->GetX() . PHP_EOL;
+            echo 'Y after multicell description : ' . $this->fpdf->GetY() . PHP_EOL;
+
+            $this->fpdf->MultiCell(0, 5, 'Description : '
+                . $guitar->getDescription(), 'J');
+            echo 'X after multicell 2 : ' . $this->fpdf->GetX() . PHP_EOL;
+            echo 'Y after multicell 2 : ' . $this->fpdf->GetY() . PHP_EOL;
 
             $this->fpdf->Output(
                 'F',
