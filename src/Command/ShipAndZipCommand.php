@@ -75,6 +75,7 @@ class ShipAndZipCommand extends Command
         $this->fpdf->SetFont('DejaVu', '', 14);
         echo 'X initial : ' . $this->fpdf->GetX() . PHP_EOL;
         echo 'Y initial : ' . $this->fpdf->GetY() . PHP_EOL;
+        // Ibanez Logo
         $this->fpdf->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
 
         echo 'X after image : ' . $this->fpdf->GetX() . PHP_EOL;
@@ -102,6 +103,7 @@ class ShipAndZipCommand extends Command
             $io->text('...creating PDF file...');
             $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
 
+            // 
             $this->fpdf->Cell(
                 0,
                 40,
@@ -116,24 +118,23 @@ class ShipAndZipCommand extends Command
 
             $this->fpdf->Ln(5);
             $this->fpdf->SetFont('DejaVu', '', 9);
-            // $this->fpdf->Text(40, 65, $guitar->getDescription());
-            // $this->fpdf->Cell(
-            //     20,
-            //     40,
-            //     'Description : '
-            //     . $guitar->getDescription(),
-            //     0,
-            //     2,
-            //     'J'
-            // );
 
             $this->fpdf->MultiCell(0, 5, 'Description : '
                 . $guitar->getDescription(), 'J');
             echo 'X after multicell description : ' . $this->fpdf->GetX() . PHP_EOL;
             echo 'Y after multicell description : ' . $this->fpdf->GetY() . PHP_EOL;
 
-            $this->fpdf->MultiCell(0, 5, 'Description : '
-                . $guitar->getDescription(), 'J');
+            $this->fpdf->Ln(5);
+
+            $colours = [''];
+            $this->fpdf->SetFillColor('#f72585');
+
+            foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
+                if (!in_array($guitarProperty, ['id', 'model', 'description'], true) && $propertyValue) {
+                    $this->fpdf->Cell(70, 8, $guitarProperty);
+                }
+            }
+
             echo 'X after multicell 2 : ' . $this->fpdf->GetX() . PHP_EOL;
             echo 'Y after multicell 2 : ' . $this->fpdf->GetY() . PHP_EOL;
 
@@ -143,7 +144,7 @@ class ShipAndZipCommand extends Command
                 true
             );
 
-            dd($this->fpdf->GetX(), $this->fpdf->GetY());
+            dd('🫀🫀 fin !');
 
         }
 
