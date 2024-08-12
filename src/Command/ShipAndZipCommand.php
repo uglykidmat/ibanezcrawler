@@ -119,19 +119,23 @@ class ShipAndZipCommand extends Command
             $this->fpdf->Ln(5);
             $this->fpdf->SetFont('DejaVu', '', 9);
 
-            $this->fpdf->MultiCell(0, 5, 'Description : '
-                . $guitar->getDescription(), 'J');
+            $this->fpdf->MultiCell(0, 5, $guitar->getDescription(), 'J');
             echo 'X after multicell description : ' . $this->fpdf->GetX() . PHP_EOL;
             echo 'Y after multicell description : ' . $this->fpdf->GetY() . PHP_EOL;
 
             $this->fpdf->Ln(5);
 
-            $colours = [''];
-            $this->fpdf->SetFillColor('#f72585');
+            $colours = ['0d1b2a', '1b263b', '415a77'];
+            //$test = array_rand($colours, 1);
+            //dd($test);
 
             foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
                 if (!in_array($guitarProperty, ['id', 'model', 'description'], true) && $propertyValue) {
-                    $this->fpdf->Cell(70, 8, $guitarProperty);
+                    $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
+                    $this->fpdf->SetTextColor(255);
+                    $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
+                    $this->fpdf->SetTextColor(0);
+                    $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
                 }
             }
 
