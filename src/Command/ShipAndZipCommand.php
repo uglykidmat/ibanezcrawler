@@ -29,7 +29,6 @@ class ShipAndZipCommand extends Command
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->serializer = $serializer;
-        $this->fpdf = $fpdf;
     }
 
     protected function configure(): void
@@ -68,19 +67,6 @@ class ShipAndZipCommand extends Command
         $nbProcessed = 0;
         $nbTotal = count($allGuitarsFromFamily);
 
-        // PDF generic/header infos
-        $this->fpdf->SetCreator('UglyKidMat');
-        $this->fpdf->AddPage();
-        $this->fpdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
-        $this->fpdf->SetFont('DejaVu', '', 14);
-        echo 'X initial : ' . $this->fpdf->GetX() . PHP_EOL;
-        echo 'Y initial : ' . $this->fpdf->GetY() . PHP_EOL;
-        // Ibanez Logo
-        $this->fpdf->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
-
-        echo 'X after image : ' . $this->fpdf->GetX() . PHP_EOL;
-        echo 'Y after image : ' . $this->fpdf->GetY() . PHP_EOL;
-
         foreach ($allGuitarsFromFamily as $guitar) {
             $nbProcessed++;
             $io->text($nbProcessed . '/' . $nbTotal . ' - 🎸 - Starting guitar ' . $guitar->getModel() . ' ...');
@@ -100,25 +86,20 @@ class ShipAndZipCommand extends Command
             file_put_contents(__DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.json', $jsonGuitar);
 
             // PDF file
+            // PDF generic/header infos
             $io->text('...creating PDF file...');
+            $this->fpdf = new tFPDF();
+            $this->fpdf->SetCreator('UglyKidMat');
+            $this->fpdf->AddPage();
+            $this->fpdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
+            $this->fpdf->SetFont('DejaVu', '', 14);
+
+            // Ibanez Logo
+            $this->fpdf->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
             $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
-
-            // 
-            $this->fpdf->Cell(
-                0,
-                40,
-                'Specifications for Ibanez '
-                . $guitar->getModel(),
-                'TB',
-                2,
-                'R'
-            );
-            echo 'X after cell : ' . $this->fpdf->GetX() . PHP_EOL;
-            echo 'Y after cell : ' . $this->fpdf->GetY() . PHP_EOL;
-
+            $this->fpdf->Cell(0, 40, 'Specifications for Ibanez ' . $guitar->getModel(), 'TB', 2, 'R');
             $this->fpdf->Ln(5);
             $this->fpdf->SetFont('DejaVu', '', 9);
-
             $this->fpdf->MultiCell(0, 5, $guitar->getDescription(), 'J');
             echo 'X after multicell description : ' . $this->fpdf->GetX() . PHP_EOL;
             echo 'Y after multicell description : ' . $this->fpdf->GetY() . PHP_EOL;
@@ -126,16 +107,15 @@ class ShipAndZipCommand extends Command
             $this->fpdf->Ln(5);
 
             $colours = ['0d1b2a', '1b263b', '415a77'];
-            //$test = array_rand($colours, 1);
-            //dd($test);
 
             foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
                 if (!in_array($guitarProperty, ['id', 'model', 'description'], true) && $propertyValue) {
                     $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
                     $this->fpdf->SetTextColor(255);
-                    $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
+                    $this->fpdf->Cell(40, 7, $guitarProperty, 1, 0, 'L', true);
                     $this->fpdf->SetTextColor(0);
                     $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
+                    // $this->fpdf->MultiCell(0,8,);
                 }
             }
 
@@ -147,9 +127,7 @@ class ShipAndZipCommand extends Command
                 __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
             );
-
-            dd('🫀🫀 fin !');
-
+            //dd('🫀🫀 fin !');
         }
 
         $io->success([
