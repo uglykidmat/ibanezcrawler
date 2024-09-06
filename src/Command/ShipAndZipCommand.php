@@ -10,6 +10,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Ugly\PDFMaker\tFPDF;
@@ -67,12 +68,16 @@ class ShipAndZipCommand extends Command
         $nbProcessed = 0;
         $nbTotal = count($allGuitarsFromFamily);
 
+        $section1 = $output->section();
+        $section2 = $output->section();
+
         foreach ($allGuitarsFromFamily as $guitar) {
             $nbProcessed++;
-            $io->text($nbProcessed . '/' . $nbTotal . ' - 🎸 - Starting guitar ' . $guitar->getModel() . ' ...');
+
+            $section1->overwrite('🎸 (' . $nbProcessed . '/' . $nbTotal . ') Starting guitar : ' . $guitar->getModel());
+            $section2->overwrite('...');
 
             // JSON file
-            $io->text('...creating JSON file...');
             $jsonGuitar = $this->serializer->serialize(
                 $guitar,
                 'json',
@@ -87,7 +92,6 @@ class ShipAndZipCommand extends Command
 
             // PDF file
             // PDF generic/header infos
-            $io->text('...creating PDF file...');
             $this->fpdf = new tFPDF();
             $this->fpdf->SetCreator('UglyKidMat');
             $this->fpdf->AddPage();
@@ -101,34 +105,35 @@ class ShipAndZipCommand extends Command
             $this->fpdf->Ln(5);
             $this->fpdf->SetFont('DejaVu', '', 9);
             $this->fpdf->MultiCell(0, 5, $guitar->getDescription(), 'J');
-            echo 'X after multicell description : ' . $this->fpdf->GetX() . PHP_EOL;
-            echo 'Y after multicell description : ' . $this->fpdf->GetY() . PHP_EOL;
-
             $this->fpdf->Ln(5);
 
             $colours = ['0d1b2a', '1b263b', '415a77'];
 
             foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
                 if (!in_array($guitarProperty, ['id', 'model', 'description'], true) && $propertyValue) {
+                    $section2->overwrite('Creating table field : ' . $guitarProperty);
                     $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
                     $this->fpdf->SetTextColor(255);
-                    $this->fpdf->Cell(40, 7, $guitarProperty, 1, 0, 'L', true);
+                    $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
                     $this->fpdf->SetTextColor(0);
-                    $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
-                    // $this->fpdf->MultiCell(0,8,);
+
+                    if (strlen($propertyValue) > 96) {
+                        $this->fpdf->MultiCell(140, 8, $propertyValue, 1, 'L');
+                    } else {
+                        $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
+                    }
                 }
             }
-
-            echo 'X after multicell 2 : ' . $this->fpdf->GetX() . PHP_EOL;
-            echo 'Y after multicell 2 : ' . $this->fpdf->GetY() . PHP_EOL;
 
             $this->fpdf->Output(
                 'F',
                 __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
             );
-            //dd('🫀🫀 fin !');
         }
+
+        $section1->clear();
+        $section2->clear();
 
         $io->success([
             '🫀  Fantastic ! 🫀  The zip file with your PDFs (' . $nbProcessed . ' entries !) is in public/data/' . $family . '/.'
