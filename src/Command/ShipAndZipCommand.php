@@ -10,10 +10,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Ugly\PDFMaker\tFPDF;
 
-// the name of the command is what users type after "php bin/console"
 #[AsCommand(
     name: 'app:shipandzip',
     description: 'Takes a guitar serie/family (S, RG, ...) as argument, and exports a .zip file containing JSON infos and a PDF, for every model of the serie.',
@@ -22,9 +23,9 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 class ShipAndZipCommand extends Command
 {
     public function __construct(
-        //private GuitarCrawler $guitarCrawler
         public EntityManagerInterface $entityManager,
-        public SerializerInterface $serializer
+        public SerializerInterface $serializer,
+        public tFPDF $fpdf,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
@@ -61,13 +62,22 @@ class ShipAndZipCommand extends Command
             mkdir(__DIR__ . '/../../public/data/' . $family, 0777, true);
         }
 
-        #Batch create JSON file for each guitar from the family
+        // Batch create JSON and PDF files for each guitar from the family
+
+        // Counter
         $nbProcessed = 0;
         $nbTotal = count($allGuitarsFromFamily);
+
+        $section1 = $output->section();
+        $section2 = $output->section();
+
         foreach ($allGuitarsFromFamily as $guitar) {
             $nbProcessed++;
-            $io->text($nbProcessed . '/' . $nbTotal . ' - 🎸 - Starting guitar ' . $guitar->getModel() . ' ...');
 
+            $section1->overwrite('🎸 (' . $nbProcessed . '/' . $nbTotal . ') Starting guitar : ' . $guitar->getModel());
+            $section2->overwrite('...');
+
+            // JSON file
             $jsonGuitar = $this->serializer->serialize(
                 $guitar,
                 'json',
@@ -76,11 +86,54 @@ class ShipAndZipCommand extends Command
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
                     AbstractObjectNormalizer::SKIP_NULL_VALUES => true
                 ],
-
             );
 
             file_put_contents(__DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.json', $jsonGuitar);
+
+            // PDF file
+            // PDF generic/header infos
+            $this->fpdf = new tFPDF();
+            $this->fpdf->SetCreator('UglyKidMat');
+            $this->fpdf->AddPage();
+            $this->fpdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
+            $this->fpdf->SetFont('DejaVu', '', 14);
+
+            // Ibanez Logo
+            $this->fpdf->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
+            $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
+            $this->fpdf->Cell(0, 40, 'Specifications for Ibanez ' . $guitar->getModel(), 'TB', 2, 'R');
+            $this->fpdf->Ln(5);
+            $this->fpdf->SetFont('DejaVu', '', 9);
+            $this->fpdf->MultiCell(0, 5, $guitar->getDescription(), 'J');
+            $this->fpdf->Ln(5);
+
+            $colours = ['0d1b2a', '1b263b', '415a77'];
+
+            foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
+                if (!in_array($guitarProperty, ['id', 'model', 'description'], true) && $propertyValue) {
+                    $section2->overwrite('Creating table field : ' . $guitarProperty);
+                    $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
+                    $this->fpdf->SetTextColor(255);
+                    $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
+                    $this->fpdf->SetTextColor(0);
+
+                    if (strlen($propertyValue) > 96) {
+                        $this->fpdf->MultiCell(140, 8, $propertyValue, 1, 'L');
+                    } else {
+                        $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
+                    }
+                }
+            }
+
+            $this->fpdf->Output(
+                'F',
+                __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
+                true
+            );
         }
+
+        $section1->clear();
+        $section2->clear();
 
         $io->success([
             '🫀  Fantastic ! 🫀  The zip file with your PDFs (' . $nbProcessed . ' entries !) is in public/data/' . $family . '/.'
