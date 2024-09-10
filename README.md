@@ -22,9 +22,11 @@ Will crawl a page of category type (https://ibanez.fandom.com/wiki/Category:S_mo
 
 #### PDF/JSON/ZIP
 `php bin/console app:shipandzip {serie/family}`
-This command will create a folder under /public/data and fill it with ZIP files
-containing two files : PDF and JSON for every guitar model of the serie. ⚠️ It
-is required to use the above commands guitarcrawler->crawl then ->addtodb before
+
+This command will create a folder under /public/data and fill it with two types of files : PDF and JSON for every guitar model of the serie, and a ZIP file contaning all the above PDF ones.
+
+⚠️ It is required to use the above commands
+guitarcrawler->crawl then ->addtodb before
 using the shipandzip command, as it needs entries in the database. 
 
 ### Necks

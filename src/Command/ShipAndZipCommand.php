@@ -10,10 +10,10 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Ugly\PDFMaker\tFPDF;
+use ZipArchive;
 
 #[AsCommand(
     name: 'app:shipandzip',
@@ -130,10 +130,20 @@ class ShipAndZipCommand extends Command
                 __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
             );
+
         }
 
         $section1->clear();
         $section2->clear();
+
+        // Initiate ZIP archive
+        $guitarZip = new ZipArchive();
+
+        if (!$guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::OVERWRITE)) {
+            $guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::CREATE);
+        }
+        $guitarZip->addPattern('/(.+)\.pdf/', __DIR__ . '/../../public/data/' . $family . '/', ['remove_all_path' => true]);
+        $guitarZip->close();
 
         $io->success([
             '🫀  Fantastic ! 🫀  The zip file with your PDFs (' . $nbProcessed . ' entries !) is in public/data/' . $family . '/.'
