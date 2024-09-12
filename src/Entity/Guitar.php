@@ -137,6 +137,9 @@ class Guitar
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $extraParenthesisInfo = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $Backorsides = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -637,5 +640,17 @@ class Guitar
     public function getAllFields()
     {
         return get_object_vars($this);
+    }
+
+    public function getBackorsides(): ?string
+    {
+        return $this->Backorsides;
+    }
+
+    public function setBackorsides(?string $Backorsides): static
+    {
+        $this->Backorsides = $Backorsides;
+
+        return $this;
     }
 }
