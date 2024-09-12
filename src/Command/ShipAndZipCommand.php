@@ -83,7 +83,7 @@ class ShipAndZipCommand extends Command
                 'json',
                 [
                     'json_encode_options' =>
-                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
                     AbstractObjectNormalizer::SKIP_NULL_VALUES => true
                 ],
             );
@@ -130,7 +130,6 @@ class ShipAndZipCommand extends Command
                 __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
             );
-
         }
 
         $section1->clear();
@@ -138,10 +137,7 @@ class ShipAndZipCommand extends Command
 
         // Initiate ZIP archive
         $guitarZip = new ZipArchive();
-
-        if (!$guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::OVERWRITE)) {
-            $guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::CREATE);
-        }
+        $guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::CREATE|ZipArchive::OVERWRITE);
         $guitarZip->addPattern('/(.+)\.pdf/', __DIR__ . '/../../public/data/' . $family . '/', ['remove_all_path' => true]);
         $guitarZip->close();
 
