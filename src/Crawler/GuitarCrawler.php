@@ -125,7 +125,14 @@ class GuitarCrawler
             foreach ($guitar as $key => $info) {
                 if (is_iterable($guitar[$key])) {
                     foreach ($guitar[$key] as $key2 => $info2) {
-                        $queryStringToEval .=
+                        if ($key2 == 'Back/sides') {
+                            $queryStringToEval .=
+                                '->setBackorsides($guitar["' .
+                                $key .
+                                '"]["' .
+                                $key2 .
+                                '"])';
+                        } else $queryStringToEval .=
                             '->set' .
                             ucfirst(trim(str_replace([' ', '(', ')'], '', (string) $key2))) .
                             '($guitar["' .
@@ -144,8 +151,9 @@ class GuitarCrawler
                 }
             }
             $queryStringToEval .= ';';
+
             //___________WOAH DANGEROUS
-            eval ($queryStringToEval);
+            eval($queryStringToEval);
             $guitarEntity->setFamily($model);
             $this->entityManager->persist($guitarEntity);
             $count++;
