@@ -32,10 +32,8 @@ class FinishParser
         //____________________CRAWLER
         $crawler = new Crawler($response);
         $finishesTable = $crawler->filterXPath("//table[@class='viewstable']/tbody//tr");
-        $finishesCounter = 0;
         $finishesParsedTable = [];
         foreach ($finishesTable as $finish) {
-            $finishesCounter++;
             preg_match('/(.*)\n+(.*)/', trim($finish->nodeValue), $matches);
             $finishesParsedTable[] = [
                 'shortname' => $matches[1],
