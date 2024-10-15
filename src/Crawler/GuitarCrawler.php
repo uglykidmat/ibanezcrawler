@@ -150,10 +150,25 @@ class GuitarCrawler
                                         'name' => $finishMatches[1],
                                         'shortname' => $finishMatches[2]
                                     ];
+                                    // dd($parsedFinishesFound);
+                                    foreach ($parsedFinishesFound as $parsedFinish) {
+                                        if (
+                                            $finishesFoundInDB = $this->entityManager->getRepository(Finish::class)->findByName($parsedFinish['name'])
+                                        ) {
+                                            echo "multiple?" . PHP_EOL;
+                                            foreach ($finishesFoundInDB as $finishFromDB) {
+                                                $guitarEntity->addStandardFinish($finishFromDB);
+                                            }
+                                            //dd($finishesFoundInDB);
 
-                                    if ($finishFoundInDB = $this->entityManager->getRepository(Finish::class)->findOneByName($finishMatches[1])) {
-                                        dd($finishFoundInDB);
+                                        } else if (
+                                            $finishFoundInDB =
+                                            $this->entityManager->getRepository(Finish::class)->findOneByName($parsedFinish['name'])
+                                        ) {
+                                            $guitarEntity->addStandardFinish($finishFoundInDB);
+                                        }
                                     }
+
                                 } else {
                                     $queryStringToEval .= '->setFinishes($guitar["' .
                                         $key .
@@ -162,7 +177,7 @@ class GuitarCrawler
                                         '"])';
                                 }
                             }
-                            dd($queryStringToEval);
+                            //dd($queryStringToEval);
                             continue;
                         }
                         if ($key2 == 'Back/sides') {

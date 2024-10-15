@@ -19,17 +19,17 @@ class FinishRepository extends ServiceEntityRepository
     //    /**
     //     * @return Finish[] Returns an array of Finish objects
     //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findByName($value): array
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.Name = :val')
+            ->setParameter('val', $value)
+            ->orderBy('f.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
     public function findOneByName($value): ?Finish
     {
