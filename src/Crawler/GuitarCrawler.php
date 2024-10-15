@@ -3,6 +3,7 @@
 namespace App\Crawler;
 
 use App\Crawler\Utils\FinishParser;
+use App\Entity\Finish;
 use App\Entity\Guitar;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DomCrawler\Crawler;
@@ -129,13 +130,39 @@ class GuitarCrawler
         $count = 0;
         $guitars = json_decode(file_get_contents(__DIR__ . '/../../public/data/' . $model . '-models.json'), true);
         foreach ($guitars as $guitar) {
-            //dd($guitar);
             $guitarEntity = new Guitar();
             $queryStringToEval = '$guitarEntity';
             foreach ($guitar as $key => $info) {
                 if (is_iterable($guitar[$key])) {
                     foreach ($guitar[$key] as $key2 => $info2) {
                         if ($key2 == 'Finish(es)') {
+                            $finishesFound =
+                                array_map(
+                                    fn($finish) => trim($finish),
+                                    explode('/', $info2)
+                                );
+                            $parsedFinishesFound = [];
+                            foreach ($finishesFound as $finishFound) {
+                                // preg_match('/(^[a-zA-Z\s\(]+)(\([A-Z]+\))\s?(.*)?/',
+                                // $finishFound, $finishMatches);
+                                if (preg_match('/(^[a-zA-Z\s]+)\s(\([A-Z]+\))\s?([0-9\W]+)?/', $finishFound, $finishMatches)) {
+                                    $parsedFinishesFound[] = [
+                                        'name' => $finishMatches[1],
+                                        'shortname' => $finishMatches[2]
+                                    ];
+
+                                    if ($finishFoundInDB = $this->entityManager->getRepository(Finish::class)->findOneByName($finishMatches[1])) {
+                                        dd($finishFoundInDB);
+                                    }
+                                } else {
+                                    $queryStringToEval .= '->setFinishes($guitar["' .
+                                        $key .
+                                        '"]["' .
+                                        $key2 .
+                                        '"])';
+                                }
+                            }
+                            dd($queryStringToEval);
                             continue;
                         }
                         if ($key2 == 'Back/sides') {
