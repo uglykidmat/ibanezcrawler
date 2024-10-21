@@ -143,32 +143,17 @@ class GuitarCrawler
                                 );
                             $parsedFinishesFound = [];
                             foreach ($finishesFound as $finishFound) {
-                                // preg_match('/(^[a-zA-Z\s\(]+)(\([A-Z]+\))\s?(.*)?/',
-                                // $finishFound, $finishMatches);
                                 if (preg_match('/(^[a-zA-Z\s]+)\s(\([A-Z]+\))\s?([0-9\W]+)?/', $finishFound, $finishMatches)) {
                                     $parsedFinishesFound[] = [
                                         'name' => $finishMatches[1],
                                         'shortname' => $finishMatches[2]
                                     ];
-                                    // dd($parsedFinishesFound);
                                     foreach ($parsedFinishesFound as $parsedFinish) {
-                                        if (
-                                            $finishesFoundInDB = $this->entityManager->getRepository(Finish::class)->findByName($parsedFinish['name'])
-                                        ) {
-                                            echo "multiple?" . PHP_EOL;
-                                            foreach ($finishesFoundInDB as $finishFromDB) {
-                                                $guitarEntity->addStandardFinish($finishFromDB);
-                                            }
-                                            //dd($finishesFoundInDB);
-
-                                        } else if (
-                                            $finishFoundInDB =
-                                            $this->entityManager->getRepository(Finish::class)->findOneByName($parsedFinish['name'])
-                                        ) {
-                                            $guitarEntity->addStandardFinish($finishFoundInDB);
+                                        $finishesFoundInDB = $this->entityManager->getRepository(Finish::class)->findByName($parsedFinish['name']);
+                                        foreach ($finishesFoundInDB as $finishFromDB) {
+                                            $guitarEntity->addStandardFinish($finishFromDB);
                                         }
                                     }
-
                                 } else {
                                     $queryStringToEval .= '->setFinishes($guitar["' .
                                         $key .
@@ -177,8 +162,6 @@ class GuitarCrawler
                                         '"])';
                                 }
                             }
-                            //dd($queryStringToEval);
-                            continue;
                         }
                         if ($key2 == 'Back/sides') {
                             $queryStringToEval .=
@@ -209,7 +192,6 @@ class GuitarCrawler
             $queryStringToEval .= ';';
 
             //___________WOAH DANGEROUS
-            //dd($queryStringToEval);
             eval ($queryStringToEval);
             $guitarEntity->setFamily($model);
             $this->entityManager->persist($guitarEntity);

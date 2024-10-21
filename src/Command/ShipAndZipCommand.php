@@ -73,9 +73,9 @@ class ShipAndZipCommand extends Command
 
         foreach ($allGuitarsFromFamily as $guitar) {
             $nbProcessed++;
-
             $section1->overwrite('🎸 (' . $nbProcessed . '/' . $nbTotal . ') Starting guitar : ' . $guitar->getModel());
             $section2->overwrite('...');
+            //dd($guitar);
 
             // JSON file
             $jsonGuitar = $this->serializer->serialize(
@@ -83,7 +83,7 @@ class ShipAndZipCommand extends Command
                 'json',
                 [
                     'json_encode_options' =>
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
                     AbstractObjectNormalizer::SKIP_NULL_VALUES => true
                 ],
             );
@@ -116,7 +116,16 @@ class ShipAndZipCommand extends Command
                     $this->fpdf->SetTextColor(255);
                     $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
                     $this->fpdf->SetTextColor(0);
-
+                    if (is_iterable($propertyValue)) {
+                        $standardFinishes = '';
+                        foreach ($propertyValue as $standardFinish) {
+                            $standardFinishes .= $standardFinish->getName()
+                                . ' ('
+                                . $standardFinish->getShortName()
+                                . '), ';
+                        }
+                        $propertyValue = substr(trim($standardFinishes), 0, -1);
+                    }
                     if (strlen($propertyValue) > 96) {
                         $this->fpdf->MultiCell(140, 8, $propertyValue, 1, 'L');
                     } else {
@@ -137,7 +146,7 @@ class ShipAndZipCommand extends Command
 
         // Initiate ZIP archive
         $guitarZip = new ZipArchive();
-        $guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::CREATE|ZipArchive::OVERWRITE);
+        $guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
         $guitarZip->addPattern('/(.+)\.pdf/', __DIR__ . '/../../public/data/' . $family . '/', ['remove_all_path' => true]);
         $guitarZip->close();
 
