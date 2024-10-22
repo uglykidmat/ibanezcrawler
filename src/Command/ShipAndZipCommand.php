@@ -75,7 +75,6 @@ class ShipAndZipCommand extends Command
             $nbProcessed++;
             $section1->overwrite('🎸 (' . $nbProcessed . '/' . $nbTotal . ') Starting guitar : ' . $guitar->getModel());
             $section2->overwrite('...');
-            //dd($guitar);
 
             // JSON file
             $jsonGuitar = $this->serializer->serialize(
@@ -84,7 +83,10 @@ class ShipAndZipCommand extends Command
                 [
                     'json_encode_options' =>
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
-                    AbstractObjectNormalizer::SKIP_NULL_VALUES => true
+                    AbstractObjectNormalizer::SKIP_NULL_VALUES =>
+                        true,
+                    // 'preserve_empty_objects' =>
+                    //     false,
                 ],
             );
 
@@ -110,26 +112,37 @@ class ShipAndZipCommand extends Command
             $colours = ['0d1b2a', '1b263b', '415a77'];
 
             foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
-                if (!in_array($guitarProperty, ['id', 'model', 'description'], true) && $propertyValue) {
-                    $section2->overwrite('Creating table field : ' . $guitarProperty);
-                    $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
-                    $this->fpdf->SetTextColor(255);
-                    $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
-                    $this->fpdf->SetTextColor(0);
+                if (!in_array($guitarProperty, ['id', 'model', 'description'], true)) {
                     if (is_iterable($propertyValue)) {
+                        if (count($propertyValue) === 0) {
+                            $guitar->getStandardFinishes()->add('None known');
+                            continue; // Skip empty iterables early
+                        }
+                        // String together collection items
                         $standardFinishes = '';
                         foreach ($propertyValue as $standardFinish) {
-                            $standardFinishes .= $standardFinish->getName()
-                                . ' ('
-                                . $standardFinish->getShortName()
-                                . '), ';
+                            $standardFinishes .= $standardFinish->getName() . ' (' . $standardFinish->getShortName() . '), ';
                         }
-                        $propertyValue = substr(trim($standardFinishes), 0, -1);
+                        // Trim trailing comma
+                        $propertyValue = rtrim($standardFinishes, ', ');
                     }
-                    if (strlen($propertyValue) > 96) {
-                        $this->fpdf->MultiCell(140, 8, $propertyValue, 1, 'L');
-                    } else {
-                        $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
+
+                    if ($propertyValue) {
+                        $section2->overwrite('Creating table field: ' . $guitarProperty);
+                        $section2->overwrite('Creating table field : ' . $guitarProperty);
+                        $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
+                        $this->fpdf->SetTextColor(255);
+                        $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
+                        $this->fpdf->SetTextColor(0);
+
+                        // Handle string property values
+                        if (is_string($propertyValue)) {
+                            if (strlen($propertyValue) > 96) {
+                                $this->fpdf->MultiCell(140, 8, $propertyValue, 1, 'L');
+                            } else {
+                                $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
+                            }
+                        }
                     }
                 }
             }
