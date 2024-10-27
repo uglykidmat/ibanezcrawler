@@ -653,7 +653,7 @@ class Guitar
 
 
     #[Ignore()]
-    public function getAllFields()
+    public function allFields()
     {
         return get_object_vars($this);
     }
