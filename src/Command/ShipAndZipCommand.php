@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Crawler\Utils\GuitarPropertiesConverter;
 use App\Entity\Guitar;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -11,7 +12,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+
 use Ugly\PDFMaker\tFPDF;
 use ZipArchive;
 
@@ -24,12 +29,11 @@ class ShipAndZipCommand extends Command
 {
     public function __construct(
         public EntityManagerInterface $entityManager,
-        public SerializerInterface $serializer,
         public tFPDF $fpdf,
+
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
-        $this->serializer = $serializer;
     }
 
     protected function configure(): void
@@ -57,17 +61,21 @@ class ShipAndZipCommand extends Command
             return Command::FAILURE;
         }
 
-        #Create folder
+        // Create folder
         if (!file_exists(__DIR__ . '/../../public/data/' . $family)) {
             mkdir(__DIR__ . '/../../public/data/' . $family, 0777, true);
         }
 
         // Batch create JSON and PDF files for each guitar from the family
 
+        // Serializer/Normalizer
+        $propertiesConverter = new GuitarPropertiesConverter;
+        $guitarNormalizer = new ObjectNormalizer(null, $propertiesConverter);
+        $guitarSerializer = new Serializer([$guitarNormalizer], [new JsonEncoder()]);
+
         // Counter
         $nbProcessed = 0;
         $nbTotal = count($allGuitarsFromFamily);
-
         $section1 = $output->section();
         $section2 = $output->section();
 
@@ -77,7 +85,7 @@ class ShipAndZipCommand extends Command
             $section2->overwrite('...');
 
             // JSON file
-            $jsonGuitar = $this->serializer->serialize(
+            $jsonGuitar = $guitarSerializer->serialize(
                 $guitar,
                 'json',
                 [
@@ -85,8 +93,8 @@ class ShipAndZipCommand extends Command
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES,
                     AbstractObjectNormalizer::SKIP_NULL_VALUES =>
                         true,
-                    // 'preserve_empty_objects' =>
-                    //     false,
+                    'preserve_empty_objects' =>
+                        false,
                 ],
             );
 
@@ -111,7 +119,7 @@ class ShipAndZipCommand extends Command
 
             $colours = ['0d1b2a', '1b263b', '415a77'];
 
-            foreach ($guitar->getAllFields() as $guitarProperty => $propertyValue) {
+            foreach ($guitar->allFields() as $guitarProperty => $propertyValue) {
                 if (!in_array($guitarProperty, ['id', 'model', 'description'], true)) {
                     if (is_iterable($propertyValue)) {
                         if (count($propertyValue) === 0) {
