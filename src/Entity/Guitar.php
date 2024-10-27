@@ -3,8 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\GuitarRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[ORM\Entity(repositoryClass: GuitarRepository::class)]
 class Guitar
@@ -139,6 +142,17 @@ class Guitar
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $Backorsides = null;
+
+    /**
+     * @var Collection<int, Finish>
+     */
+    #[ORM\ManyToMany(targetEntity: Finish::class)]
+    private Collection $StandardFinishes;
+
+    public function __construct()
+    {
+        $this->StandardFinishes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -637,7 +651,9 @@ class Guitar
         return $this;
     }
 
-    public function getAllFields()
+
+    #[Ignore()]
+    public function allFields()
     {
         return get_object_vars($this);
     }
@@ -650,6 +666,30 @@ class Guitar
     public function setBackorsides(?string $Backorsides): static
     {
         $this->Backorsides = $Backorsides;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Finish>
+     */
+    public function getStandardFinishes(): Collection
+    {
+        return $this->StandardFinishes;
+    }
+
+    public function addStandardFinish(Finish $standardFinish): static
+    {
+        if (!$this->StandardFinishes->contains($standardFinish)) {
+            $this->StandardFinishes->add($standardFinish);
+        }
+
+        return $this;
+    }
+
+    public function removeStandardFinish(Finish $standardFinish): static
+    {
+        $this->StandardFinishes->removeElement($standardFinish);
 
         return $this;
     }

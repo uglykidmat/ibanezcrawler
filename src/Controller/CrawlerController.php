@@ -19,7 +19,7 @@ class CrawlerController extends AbstractController
     #[Route('/', name: 'app_welcome')]
     public function index()
     {
-
+        //phpinfo();
         return $this->json(
             [
                 'Crawler URLs' =>
@@ -30,8 +30,8 @@ class CrawlerController extends AbstractController
                     ],
                 'Info URLs' =>
                     [
-                        'See a specific model' => '/guitar/{model}',
-                        'See a specific family (S, RG, Prestige, etc)' => '/guitars/{serie}',
+                        'See a specific model' => '/guitar/model/{model}',
+                        'See a specific family (S, RG, Prestige, etc)' => '/guitars/family/{serie}',
                     ]
             ]
         );
