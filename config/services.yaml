@@ -19,19 +19,6 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-    Ugly\PDFMaker\FPDF:
-        class: Ugly\PDFMaker\FPDF
-        autowire: true
-    Ugly\PDFMaker\tFPDF:
-        class: Ugly\PDFMaker\tFPDF
-        autowire: true
-    Ugly\PDFMaker\Fonts\TTFontFile:
-        class: Ugly\PDFMaker\Fonts\TTFontFile
-        autowire: true
-
-    # Ugly\PDFMaker\:
-    #     resource: '../vendor/FPDF'
-    #     public: true
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

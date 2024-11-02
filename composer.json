@@ -37,8 +37,8 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/",
-            "Ugly\\PDFMaker\\": "vendor/FPDF/",
-            "Ugly\\PDFMaker\\Fonts\\TTFontFile\\": "vendor/FPDF/font/unifont/"
+            "FPDF\\": "vendor/FPDF/",
+            "FPDF\\Fonts\\TTFontFile\\": "vendor/FPDF/font/unifont/"
         }
     },
     "autoload-dev": {

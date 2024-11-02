@@ -2,23 +2,22 @@
 
 namespace App\Command;
 
-use App\Crawler\Utils\GuitarPropertiesConverter;
+use FPDF\tFPDF;
+use ZipArchive;
 use App\Entity\Guitar;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Console\Command\Command;
+use App\Crawler\Utils\GuitarPropertiesConverter;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 
-use Ugly\PDFMaker\tFPDF;
-use ZipArchive;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
 #[AsCommand(
     name: 'app:shipandzip',
@@ -28,9 +27,7 @@ use ZipArchive;
 class ShipAndZipCommand extends Command
 {
     public function __construct(
-        public EntityManagerInterface $entityManager,
-        public tFPDF $fpdf,
-
+        public EntityManagerInterface $entityManager
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
@@ -102,20 +99,20 @@ class ShipAndZipCommand extends Command
 
             // PDF file
             // PDF generic/header infos
-            $this->fpdf = new tFPDF();
-            $this->fpdf->SetCreator('UglyKidMat');
-            $this->fpdf->AddPage();
-            $this->fpdf->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
-            $this->fpdf->SetFont('DejaVu', '', 14);
+            $tfPDF = new tFPDF();
+            $tfPDF->SetCreator('UglyKidMat');
+            $tfPDF->AddPage();
+            $tfPDF->AddFont('DejaVu', '', 'DejaVuSansCondensed.ttf', true);
+            $tfPDF->SetFont('DejaVu', '', 14);
 
             // Ibanez Logo
-            $this->fpdf->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
-            $this->fpdf->SetTitle('Ibanez ' . $guitar->getModel());
-            $this->fpdf->Cell(0, 40, 'Specifications for Ibanez ' . $guitar->getModel(), 'TB', 2, 'R');
-            $this->fpdf->Ln(5);
-            $this->fpdf->SetFont('DejaVu', '', 9);
-            $this->fpdf->MultiCell(0, 5, $guitar->getDescription(), 'J');
-            $this->fpdf->Ln(5);
+            $tfPDF->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
+            $tfPDF->SetTitle('Ibanez ' . $guitar->getModel());
+            $tfPDF->Cell(0, 40, 'Specifications for Ibanez ' . $guitar->getModel(), 'TB', 2, 'R');
+            $tfPDF->Ln(5);
+            $tfPDF->SetFont('DejaVu', '', 9);
+            $tfPDF->MultiCell(0, 5, $guitar->getDescription(), 'J');
+            $tfPDF->Ln(5);
 
             $colours = ['0d1b2a', '1b263b', '415a77'];
 
@@ -138,24 +135,24 @@ class ShipAndZipCommand extends Command
                     if ($propertyValue) {
                         $section2->overwrite('Creating table field: ' . $guitarProperty);
                         $section2->overwrite('Creating table field : ' . $guitarProperty);
-                        $this->fpdf->SetFillColor($colours[array_rand($colours, 1)]);
-                        $this->fpdf->SetTextColor(255);
-                        $this->fpdf->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
-                        $this->fpdf->SetTextColor(0);
+                        $tfPDF->SetFillColor($colours[array_rand($colours, 1)]);
+                        $tfPDF->SetTextColor(255);
+                        $tfPDF->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
+                        $tfPDF->SetTextColor(0);
 
                         // Handle string property values
                         if (is_string($propertyValue)) {
                             if (strlen($propertyValue) > 96) {
-                                $this->fpdf->MultiCell(140, 8, $propertyValue, 1, 'L');
+                                $tfPDF->MultiCell(140, 8, $propertyValue, 1, 'L');
                             } else {
-                                $this->fpdf->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
+                                $tfPDF->Cell(140, 8, $propertyValue, 1, 1, 'L', false);
                             }
                         }
                     }
                 }
             }
 
-            $this->fpdf->Output(
+            $tfPDF->Output(
                 'F',
                 __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
