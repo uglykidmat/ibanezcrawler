@@ -8,6 +8,13 @@ Symfony 7
 
 ## Commands
 
+### TL;DR
+Example for S serie
+* `php bin/console app:guitarcrawler s crawl`
+* `php bin/console app:guitarcrawler s addtodb`
+* `php bin/console app:shipandzip s`
+* `php bin/console app:guitarcrawler s purgefromdb`
+
 ### Guitars
 #### Crawl
 `php bin/console app:guitarcrawler {serie/family name} {crawl|addtodb|purgefromdb}`
