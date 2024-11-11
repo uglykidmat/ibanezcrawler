@@ -2,37 +2,35 @@
 
 namespace App\Controller;
 
+use App\Crawler\GuitarCrawler;
+use App\Crawler\NeckCrawler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Crawler\GuitarCrawler;
-use App\Crawler\NeckCrawler;
 
 class CrawlerController extends AbstractController
 {
     public function __construct(
         private GuitarCrawler $guitarCrawler,
-        private NeckCrawler $neckCrawler
+        private NeckCrawler $neckCrawler,
     ) {
     }
 
     #[Route('/', name: 'app_welcome')]
     public function index()
     {
-        //phpinfo();
+        // phpinfo();
         return $this->json(
             [
-                'Crawler URLs' =>
-                    [
-                        'Crawl one guitar (example/test)' => '/crawler/guitar',
-                        'Crawl guitars by model (S, RG, Prestige, etc)' => '/crawler/guitars/{serie}',
-                        'Crawl guitar necks' => '/crawler/guitarnecks',
-                    ],
-                'Info URLs' =>
-                    [
-                        'See a specific model' => '/guitar/model/{model}',
-                        'See a specific family (S, RG, Prestige, etc)' => '/guitars/family/{serie}',
-                    ]
+                'Crawler URLs' => [
+                    'Crawl one guitar (example/test)' => '/crawler/guitar',
+                    'Crawl guitars by model (S, RG, Prestige, etc)' => '/crawler/guitars/{serie}',
+                    'Crawl guitar necks' => '/crawler/guitarnecks',
+                ],
+                'Info URLs' => [
+                    'See a specific model' => '/guitar/model/{model}',
+                    'See a specific family (S, RG, Prestige, etc)' => '/guitars/family/{serie}',
+                ],
             ]
         );
     }
@@ -48,16 +46,17 @@ class CrawlerController extends AbstractController
             return $this->json(
                 [
                     'info' => 'Here are the results, but the JSON file has not been created/updated. Use app:guitarcrawler [Serie] for this.',
-                    'results' => $SerieResponse
+                    'results' => $SerieResponse,
                 ]
             );
-        } else
+        } else {
             return $this->json(
                 [
                     'info' => 'fail',
-                    'results' => 'none'
+                    'results' => 'none',
                 ]
             );
+        }
     }
 
     #[Route('/crawler/guitarnecks', name: 'crawler_guitar_necks')]

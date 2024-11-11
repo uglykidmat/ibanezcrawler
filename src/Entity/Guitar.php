@@ -651,7 +651,6 @@ class Guitar
         return $this;
     }
 
-
     #[Ignore()]
     public function allFields()
     {

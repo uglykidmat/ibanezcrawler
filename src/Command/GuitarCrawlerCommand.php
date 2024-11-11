@@ -3,12 +3,12 @@
 namespace App\Command;
 
 use App\Crawler\GuitarCrawler;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 // the name of the command is what users type after "php bin/console"
 #[AsCommand(
@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GuitarCrawlerCommand extends Command
 {
     public function __construct(
-        private GuitarCrawler $guitarCrawler
+        private GuitarCrawler $guitarCrawler,
     ) {
         parent::__construct();
     }
@@ -52,25 +52,25 @@ class GuitarCrawlerCommand extends Command
 
         switch ($funxion) {
             case 'crawl':
-                $io->note('🕷️  Parsing 🕷️  model ' . $model . ' ...');
+                $io->note('🕷️  Parsing 🕷️  model '.$model.' ...');
                 $modelCategoryResult = $this->guitarCrawler->crawlGuitarCategory($model);
-                file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                file_put_contents(__DIR__.'/../../public/data/'.$model.'-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                 $io->success([
-                    '🕸️  Crawl results ! 🕸️  See JSON file in public/data/'
+                    '🕸️  Crawl results ! 🕸️  See JSON file in public/data/',
                 ]);
 
                 return Command::SUCCESS;
             case 'addtodb':
                 $nbProcessed = $this->guitarCrawler->addGuitarsToDb($model);
                 $io->success([
-                    '🕸️  Done ! 🕸️  ' . $nbProcessed . ' ' . $model . ' models added to database !'
+                    '🕸️  Done ! 🕸️  '.$nbProcessed.' '.$model.' models added to database !',
                 ]);
 
                 break;
             case 'purgefromdb':
                 $nbProcessed = $this->guitarCrawler->purgeGuitars($model);
                 $io->success([
-                    '🕸️  Done ! 🕸️  ' . $nbProcessed . ' ' . $model . ' purged from database !'
+                    '🕸️  Done ! 🕸️  '.$nbProcessed.' '.$model.' purged from database !',
                 ]);
 
                 break;

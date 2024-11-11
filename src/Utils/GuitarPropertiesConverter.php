@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Crawler\Utils;
+
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 class GuitarPropertiesConverter implements NameConverterInterface

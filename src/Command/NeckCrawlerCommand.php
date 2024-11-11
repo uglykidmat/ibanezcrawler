@@ -3,13 +3,12 @@
 namespace App\Command;
 
 use App\Crawler\NeckCrawler;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:neckcrawler',
@@ -19,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class NeckCrawlerCommand extends Command
 {
     public function __construct(
-        private NeckCrawler $neckCrawler
+        private NeckCrawler $neckCrawler,
     ) {
         parent::__construct();
     }
@@ -40,7 +39,7 @@ class NeckCrawlerCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $funxion = $input->getArgument('funxion');
-        $io->text('🕷️ Executing 🕷️ funxion ' . $funxion . ' ...');
+        $io->text('🕷️ Executing 🕷️ funxion '.$funxion.' ...');
 
         $nbProcessed = 0;
         switch ($funxion) {
@@ -59,7 +58,7 @@ class NeckCrawlerCommand extends Command
         }
 
         $io->success([
-            '🕸️  ' . $funxion . ' done with ' . $nbProcessed . ' entries ! 🕸️'
+            '🕸️  '.$funxion.' done with '.$nbProcessed.' entries ! 🕸️',
         ]);
 
         return Command::SUCCESS;
