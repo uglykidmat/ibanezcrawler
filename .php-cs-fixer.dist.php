@@ -9,5 +9,6 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony' => true,
     ])
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setFinder($finder)
 ;
