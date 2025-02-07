@@ -1,6 +1,11 @@
 # Ibanez wiki scraper
 
-In a perfect world, nobody uses Wikia.
+DISCLAIMER : this is a small project I built for fun and learning. It has no
+particular use case. I just like requesting, parsing and PHP'ing in general. In
+my wildest dreams, this backend would be used by a frontend app using Three.js or
+something, for displaying guitar models in 3D. I am NOT there yet 🤧.
+
+Anyway : in a perfect world, nobody uses Wikia.
 https://ibanez.fandom.com/ made the rookie mistake of doing this instead of wiki.gg or something less cringe.
 
 ## Tech
