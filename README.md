@@ -59,3 +59,7 @@ If someone ever uses a browser
 ## API endpoints
 * Get a single guitar model : `/guitars/model/{model}` ("S450", "FGM100", ...)
 * Get all guitars by family : `/guitars/family/{family}` ("S", "Prestige", ...)
+
+## database
+I used PostgreSQL 16 but it should work fine with MySQL. Obviously, don't forget to set your .env with
+* DATABASE_URL="postgresql://user:pass@address:port/ibanez?serverVersion=version&charset=utf8"
