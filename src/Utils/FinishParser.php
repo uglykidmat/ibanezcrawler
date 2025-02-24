@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Crawler\Utils;
+namespace App\Utils;
 
 use App\Entity\Finish;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +28,7 @@ class FinishParser
     {
         $finishesURL = 'https://ibanez.fandom.com/wiki/List_of_finishes';
         $response = $this->client->request('GET', $finishesURL)->getContent();
-        echo '🎨 Also checking for new finishes at https://ibanez.fandom.com/wiki/List_of_finishes...'.PHP_EOL;
+        echo '🎨 Also checking for new finishes at https://ibanez.fandom.com/wiki/List_of_finishes...' . PHP_EOL;
         // ____________________CRAWLER
         $crawler = new Crawler($response);
         $finishesTable = $crawler->filterXPath("//table[@class='viewstable']/tbody//tr");
@@ -55,11 +55,11 @@ class FinishParser
                 $newFinish = new Finish();
                 $newFinish->setShortName($finishToAdd['shortname'])->setName($finishToAdd['name']);
                 $this->entityManager->persist($newFinish);
-                echo '🎨 Add new finish "'.$finishToAdd['name'].'"'.PHP_EOL;
+                echo '🎨 Add new finish "' . $finishToAdd['name'] . '"' . PHP_EOL;
             }
             $this->entityManager->flush();
         } else {
-            echo '🎨 ...nah, the whole spectrum is here.'.PHP_EOL;
+            echo '🎨 ...nah, the whole spectrum is here.' . PHP_EOL;
         }
 
         return true;

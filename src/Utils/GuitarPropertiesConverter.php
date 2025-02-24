@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Crawler\Utils;
+namespace App\Utils;
 
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 

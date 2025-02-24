@@ -21,8 +21,8 @@ final class Version20240420230320 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf(
-            !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\PostgreSQL100Platform,
-            "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\PostgreSQL100Platform'."
+            stripos($this->platform->getName(), 'postgresql') === false,
+            'Migration can only be executed safely on a PostgreSQL database.'
         );
         $this->addSql('CREATE SEQUENCE guitar_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
 

@@ -1,0 +1,25 @@
+{
+    "name": "fpdf/tfpdf",
+    "description": "tFPDF Lib.",
+    "type": "library",
+    "homepage": "http://www.fpdf.org/",
+    "license": "MIT",
+    "keywords": [
+        "pdf"
+    ],
+    "authors": [
+        {
+            "name": "Ugly",
+            "email": "ugly@gmail.com"
+        }
+    ],
+    "require": {},
+    "require-dev": {},
+    "autoload": {
+        "psr-4": {
+            "FPDF\\": "/",
+            "tFPDF\\": "/"
+        }
+    },
+    "autoload-dev": {}
+}

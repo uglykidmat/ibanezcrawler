@@ -37,8 +37,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/",
-            "FPDF\\": "vendor/FPDF/",
-            "FPDF\\Fonts\\TTFontFile\\": "vendor/FPDF/font/unifont/"
+            "App\\Utils\\FPDF\\": "src/Utils/FPDF/"
         }
     },
     "autoload-dev": {
