@@ -28,7 +28,7 @@ class CrawlerController extends AbstractController
                     'Crawl guitar necks' => '/crawler/guitarnecks',
                 ],
                 'Info URLs' => [
-                    'See a specific model' => '/guitar/model/{model}',
+                    'See a specific model' => '/guitars/model/{model}',
                     'See a specific family (S, RG, Prestige, etc)' => '/guitars/family/{serie}',
                 ],
             ]

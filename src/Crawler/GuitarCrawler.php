@@ -2,7 +2,7 @@
 
 namespace App\Crawler;
 
-use App\Crawler\Utils\FinishParser;
+use App\Utils\FinishParser;
 use App\Entity\Finish;
 use App\Entity\Guitar;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,7 +23,7 @@ class GuitarCrawler
     {
         if (!$nextPage) {
             $serie = str_replace(' ', '_', $serie);
-            $url = 'https://ibanez.fandom.com/wiki/Category:'.$serie.'_models';
+            $url = 'https://ibanez.fandom.com/wiki/Category:' . $serie . '_models';
         } else {
             $url = $nextPage;
         }
@@ -36,7 +36,7 @@ class GuitarCrawler
         // ____________________BUILD-MODELS_LIST_URLS
         $modelsURLs = [];
         foreach ($categoryCrawlResult as $key => $modelSubpageURL) {
-            $modelsURLs[] = 'https://ibanez.fandom.com'.$modelSubpageURL->textContent;
+            $modelsURLs[] = 'https://ibanez.fandom.com' . $modelSubpageURL->textContent;
         }
         // ____________________CRAWL-ONE-BY-ONE
         $outputCount = 0;
@@ -44,7 +44,7 @@ class GuitarCrawler
             $allGuitarsOfPage[] = $this->crawlOneGuitar($modelURL);
             // ____________________CRAWL-LOG!
             ++$outputCount;
-            echo ' ✅ ['.$outputCount.'/'.count($modelsURLs).'] Finito el traitemento de los modelos -> ', $modelURL, ' ! Ayyyy caramba !', PHP_EOL;
+            echo ' ✅ [' . $outputCount . '/' . count($modelsURLs) . '] Finito el traitemento de los modelos -> ', $modelURL, ' ! Ayyyy caramba !', PHP_EOL;
         }
         // ____________________Recursive crawl on next pages
         if ($nextPageURL = $crawler->filterXPath('//div[@class="category-page__pagination"]//a[contains(@class,"category-page__pagination-next")]/@href')->getNode(0)) {
@@ -130,7 +130,7 @@ class GuitarCrawler
 
         // Start DB insertions
         $count = 0;
-        $guitars = json_decode(file_get_contents(__DIR__.'/../../public/data/'.$model.'-models.json'), true);
+        $guitars = json_decode(file_get_contents(__DIR__ . '/../../public/data/' . $model . '-models.json'), true);
         foreach ($guitars as $guitar) {
             $guitarEntity = new Guitar();
             $queryStringToEval = '$guitarEntity';
@@ -140,7 +140,7 @@ class GuitarCrawler
                         if ('Finish(es)' == $key2) {
                             $finishesFound =
                                 array_map(
-                                    fn ($finish) => trim($finish),
+                                    fn($finish) => trim($finish),
                                     explode('/', $info2)
                                 );
                             $parsedFinishesFound = [];
@@ -157,49 +157,49 @@ class GuitarCrawler
                                         }
                                     }
                                 } else {
-                                    $queryStringToEval .= '->setFinishes($guitar["'.
-                                        $key.
-                                        '"]["'.
-                                        $key2.
+                                    $queryStringToEval .= '->setFinishes($guitar["' .
+                                        $key .
+                                        '"]["' .
+                                        $key2 .
                                         '"])';
                                 }
                             }
                         }
                         if ('Back/sides' == $key2) {
                             $queryStringToEval .=
-                                '->setBackorsides($guitar["'.
-                                $key.
-                                '"]["'.
-                                $key2.
+                                '->setBackorsides($guitar["' .
+                                $key .
+                                '"]["' .
+                                $key2 .
                                 '"])';
                         } else {
                             $queryStringToEval .=
-                                    '->set'.
-                                    ucfirst(trim(str_replace([' ', '(', ')'], '', (string) $key2))).
-                                    '($guitar["'.
-                                    $key.
-                                    '"]["'.
-                                    $key2.
-                                    '"])';
+                                '->set' .
+                                ucfirst(trim(str_replace([' ', '(', ')'], '', (string) $key2))) .
+                                '($guitar["' .
+                                $key .
+                                '"]["' .
+                                $key2 .
+                                '"])';
                         }
                     }
                 } else {
                     $queryStringToEval .=
-                        '->set'.
-                        ucfirst(trim(str_replace(' ', '', (string) $key))).
-                        '($guitar["'.
-                        $key.
+                        '->set' .
+                        ucfirst(trim(str_replace(' ', '', (string) $key))) .
+                        '($guitar["' .
+                        $key .
                         '"])';
                 }
             }
             $queryStringToEval .= ';';
 
             // ___________WOAH DANGEROUS
-            eval($queryStringToEval);
+            eval ($queryStringToEval);
             $guitarEntity->setFamily($model);
             $this->entityManager->persist($guitarEntity);
             ++$count;
-            echo '🤡 Adding '.$guitar['model'].PHP_EOL;
+            echo '🤡 Adding ' . $guitar['model'] . PHP_EOL;
         }
         $this->entityManager->flush();
 
