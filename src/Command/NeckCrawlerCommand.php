@@ -39,7 +39,7 @@ class NeckCrawlerCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $funxion = $input->getArgument('funxion');
-        $io->text('🕷️ Executing 🕷️ funxion ' . $funxion . ' ...');
+        $io->text('🕷️ Executing 🕷️ funxion '.$funxion.' ...');
 
         $nbProcessed = 0;
         switch ($funxion) {
@@ -58,7 +58,7 @@ class NeckCrawlerCommand extends Command
         }
 
         $io->success([
-            '🕸️  ' . $funxion . ' done with ' . $nbProcessed . ' entries ! 🕸️',
+            '🕸️  '.$funxion.' done with '.$nbProcessed.' entries ! 🕸️',
         ]);
 
         return Command::SUCCESS;
