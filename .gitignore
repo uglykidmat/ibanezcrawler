@@ -14,5 +14,8 @@ TODO
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
-###< friendsofphp/php-cs-fixer ###
-Dockerfile
+
+### FPDF
+/src/Utils/FPDF/font/unifont/*.cw.dat
+/src/Utils/FPDF/font/unifont/*.cw127.php
+/src/Utils/FPDF/font/unifont/*.mtx.php

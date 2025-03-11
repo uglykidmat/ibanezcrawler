@@ -9,7 +9,26 @@ Anyway : in a perfect world, nobody uses Wikia.
 https://ibanez.fandom.com/ made the rookie mistake of doing this instead of wiki.gg or something less cringe.
 
 ## Tech
-Symfony 7
+Symfony 7, postgreSQL 16
+
+## Installation
+### DDEV
+1. `git clone https://github.com/uglykidmat/ibanezcrawler.git /path/to/your/garbage-projects/folder`
+2. `cd /path/to/your/garbage-projects/folder`
+2. `ddev config`
+3. `ddev start`
+4. `ddev composer install`
+   
+### Docker
+I used [FrankenPHP's "Symfony-docker"
+image](https://github.com/dunglas/symfony-docker/blob/main/docs/existing-project.md).
+Follow their "installing on an existing project" doc after having cloned this
+repo, then "docker compose up --build -d" will spin up the app and its database.
+
+### Other
+Clone te project, update the .env file with
+`DATABASE_URL="postgres://user:pass@postgres:5432/ibanez?charset=utf8&serverVersion=16"`,
+with the correct user/pass/dbaddress values for your local postgreSQL instance.
 
 ## Commands
 

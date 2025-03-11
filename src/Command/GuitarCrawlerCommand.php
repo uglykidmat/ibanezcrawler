@@ -50,28 +50,50 @@ class GuitarCrawlerCommand extends Command
         $funxion = $input->getArgument('funxion');
         $nbProcessed = 0;
 
+        $io->title('⏳ Benchmarking performance');
+        $start = microtime(true);
+
         switch ($funxion) {
             case 'crawl':
-                $io->note('🕷️  Parsing 🕷️  model '.$model.' ...');
+                $io->note('🕷️  Parsing 🕷️  model ' . $model . ' ...');
                 $modelCategoryResult = $this->guitarCrawler->crawlGuitarCategory($model);
-                file_put_contents(__DIR__.'/../../public/data/'.$model.'-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+                file_put_contents(__DIR__ . '/../../public/data/' . $model . '-models.json', json_encode($modelCategoryResult, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
                 $io->success([
                     '🕸️  Crawl results ! 🕸️  See JSON file in public/data/',
                 ]);
+                $end = microtime(true);
+                $executionTime = $end - $start;
+                $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+                $io->section('Results');
+                $io->success("Execution Time: {$executionTime} seconds");
+                $io->success("Memory Usage: " . round($memoryUsage, 2) . " MB");
 
                 return Command::SUCCESS;
             case 'addtodb':
                 $nbProcessed = $this->guitarCrawler->addGuitarsToDb($model);
                 $io->success([
-                    '🕸️  Done ! 🕸️  '.$nbProcessed.' '.$model.' models added to database !',
+                    '🕸️  Done ! 🕸️  ' . $nbProcessed . ' ' . $model . ' models added to database !',
                 ]);
+                $end = microtime(true);
+                $executionTime = $end - $start;
+                $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+                $io->section('Results');
+                $io->success("Execution Time: {$executionTime} seconds");
+                $io->success("Memory Usage: " . round($memoryUsage, 2) . " MB");
 
                 break;
             case 'purgefromdb':
                 $nbProcessed = $this->guitarCrawler->purgeGuitars($model);
                 $io->success([
-                    '🕸️  Done ! 🕸️  '.$nbProcessed.' '.$model.' purged from database !',
+                    '🕸️  Done ! 🕸️  ' . $nbProcessed . ' ' . $model . ' purged from database !',
                 ]);
+
+                $end = microtime(true);
+                $executionTime = $end - $start;
+                $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+                $io->section('Results');
+                $io->success("Execution Time: {$executionTime} seconds");
+                $io->success("Memory Usage: " . round($memoryUsage, 2) . " MB");
 
                 break;
             default:
