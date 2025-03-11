@@ -51,7 +51,9 @@ class ShipAndZipCommand extends Command
 
         $family = strlen($family) > 3 ? ucfirst($family) : strtoupper($family);
 
-        $io->note('🤐  Starting 🤐  serie '.$family.' ...');
+        $io->note('🤐  Starting 🤐  serie ' . $family . ' ...');
+        $io->title('⏳ Benchmarking performance');
+        $start = microtime(true);
 
         if (!count($allGuitarsFromFamily = $this->entityManager->getRepository(Guitar::class)->findByFamily($family)) > 0) {
             $io->error(['result' => 'error', 'reason' => 'No entry in the database for this family !']);
@@ -60,8 +62,8 @@ class ShipAndZipCommand extends Command
         }
 
         // Create folder
-        if (!file_exists(__DIR__.'/../../public/data/'.$family)) {
-            mkdir(__DIR__.'/../../public/data/'.$family, 0777, true);
+        if (!file_exists(__DIR__ . '/../../public/data/' . $family)) {
+            mkdir(__DIR__ . '/../../public/data/' . $family, 0777, true);
         }
 
         // Batch create JSON and PDF files for each guitar from the family
@@ -79,7 +81,7 @@ class ShipAndZipCommand extends Command
 
         foreach ($allGuitarsFromFamily as $guitar) {
             ++$nbProcessed;
-            $section1->overwrite('🎸 ('.$nbProcessed.'/'.$nbTotal.') Starting guitar : '.$guitar->getModel());
+            $section1->overwrite('🎸 (' . $nbProcessed . '/' . $nbTotal . ') Starting guitar : ' . $guitar->getModel());
             $section2->overwrite('...');
 
             // JSON file
@@ -93,7 +95,7 @@ class ShipAndZipCommand extends Command
                 ],
             );
 
-            file_put_contents(__DIR__.'/../../public/data/'.$family.'/'.$guitar->getModel().'.json', $jsonGuitar);
+            file_put_contents(__DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.json', $jsonGuitar);
 
             // PDF file
             // PDF generic/header infos
@@ -104,9 +106,9 @@ class ShipAndZipCommand extends Command
             $tfPDF->SetFont('DejaVu', '', 14);
 
             // Ibanez Logo
-            $tfPDF->Image(__DIR__.'/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
-            $tfPDF->SetTitle('Ibanez '.$guitar->getModel());
-            $tfPDF->Cell(0, 40, 'Specifications for Ibanez '.$guitar->getModel(), 'TB', 2, 'R');
+            $tfPDF->Image(__DIR__ . '/../../public/assets/ibanez-logo-small-swoosh-300.png', 10, 10);
+            $tfPDF->SetTitle('Ibanez ' . $guitar->getModel());
+            $tfPDF->Cell(0, 40, 'Specifications for Ibanez ' . $guitar->getModel(), 'TB', 2, 'R');
             $tfPDF->Ln(5);
             $tfPDF->SetFont('DejaVu', '', 9);
             $tfPDF->MultiCell(0, 5, $guitar->getDescription(), 'J');
@@ -124,15 +126,15 @@ class ShipAndZipCommand extends Command
                         // String together collection items
                         $standardFinishes = '';
                         foreach ($propertyValue as $standardFinish) {
-                            $standardFinishes .= $standardFinish->getName().' ('.$standardFinish->getShortName().'), ';
+                            $standardFinishes .= $standardFinish->getName() . ' (' . $standardFinish->getShortName() . '), ';
                         }
                         // Trim trailing comma
                         $propertyValue = rtrim($standardFinishes, ', ');
                     }
 
                     if ($propertyValue) {
-                        $section2->overwrite('Creating table field: '.$guitarProperty);
-                        $section2->overwrite('Creating table field : '.$guitarProperty);
+                        $section2->overwrite('Creating table field: ' . $guitarProperty);
+                        $section2->overwrite('Creating table field : ' . $guitarProperty);
                         $tfPDF->SetFillColor($colours[array_rand($colours, 1)]);
                         $tfPDF->SetTextColor(255);
                         $tfPDF->Cell(40, 8, $guitarProperty, 1, 0, 'L', true);
@@ -152,7 +154,7 @@ class ShipAndZipCommand extends Command
 
             $tfPDF->Output(
                 'F',
-                __DIR__.'/../../public/data/'.$family.'/'.$guitar->getModel().'.pdf',
+                __DIR__ . '/../../public/data/' . $family . '/' . $guitar->getModel() . '.pdf',
                 true
             );
         }
@@ -162,13 +164,19 @@ class ShipAndZipCommand extends Command
 
         // Initiate ZIP archive
         $guitarZip = new \ZipArchive();
-        $guitarZip->open(__DIR__.'/../../public/data/'.$family.'/'.$family.'_models.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-        $guitarZip->addPattern('/(.+)\.pdf/', __DIR__.'/../../public/data/'.$family.'/', ['remove_all_path' => true]);
+        $guitarZip->open(__DIR__ . '/../../public/data/' . $family . '/' . $family . '_models.zip', \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $guitarZip->addPattern('/(.+)\.pdf/', __DIR__ . '/../../public/data/' . $family . '/', ['remove_all_path' => true]);
         $guitarZip->close();
 
         $io->success([
-            '🫀  Fantastic ! 🫀  The zip file with your PDFs ('.$nbProcessed.' entries !) is in public/data/'.$family.'/.',
+            '🫀  Fantastic ! 🫀  The zip file with your PDFs (' . $nbProcessed . ' entries !) is in public/data/' . $family . '/.',
         ]);
+        $end = microtime(true);
+        $executionTime = $end - $start;
+        $memoryUsage = memory_get_usage(true) / 1024 / 1024;
+        $io->section('Results');
+        $io->success("Execution Time: {$executionTime} seconds");
+        $io->success("Memory Usage: " . round($memoryUsage, 2) . " MB");
 
         return Command::SUCCESS;
     }
