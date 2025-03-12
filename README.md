@@ -23,10 +23,10 @@ Symfony 7, postgreSQL 16
 I used [FrankenPHP's "Symfony-docker"
 image](https://github.com/dunglas/symfony-docker/blob/main/docs/existing-project.md).
 Follow their "installing on an existing project" doc after having cloned this
-repo, then "docker compose up --build -d" will spin up the app and its database.
+repo, then `docker compose up --build -d` will spin up the app and its database.
 
 ### Other
-Clone te project, update the .env file with
+Clone the project, update the .env file with
 `DATABASE_URL="postgres://user:pass@postgres:5432/ibanez?charset=utf8&serverVersion=16"`,
 with the correct user/pass/dbaddress values for your local postgreSQL instance.
 
