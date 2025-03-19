@@ -1,3 +1,6 @@
-body {
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* body {
     background-color: lightgray;
-}
+} */
