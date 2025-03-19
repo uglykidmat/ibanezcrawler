@@ -1,21 +1,54 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Ibanez Crawler - Home{% endblock %}</title>
-        
-        {% block stylesheets %}
-        {{ encore_entry_link_tags('app') }}
-        {% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        {% block javascripts %}
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    {% endblock %}
+    {% block title %}
+        <title>{{ page_title }}</title>
+    {% endblock %}
+</head>
+<body class="flex bg-base-200 min-h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-base-100 shadow-lg p-4 h-screen fixed lg:static -translate-x-64 lg:translate-x-0 transition-transform duration-300 z-10">
+        <h1 class="text-xl font-bold mb-4">IBZCRWLR</h1>
+        <ul class="space-y-2">
+            <li><a href="{{ path('app_welcome') }}" class="block p-2 rounded hover:bg-base-200">🏠 Home</a></li>
+            <li><a href="{{ path('app_dashboard') }}" class="block p-2 rounded hover:bg-base-200">📊 Dashboard</a></li>
+            <li><a href="{{ path('app_guitarsearch') }}" class="block p-2 rounded hover:bg-base-200">🔎 Model Search</a></li>
+            <li><a href="{{ path('app_guitarview') }}" class="block p-2 rounded hover:bg-base-200">🎸 Guitar Viewer</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex flex-col flex-1 transition-all duration-300">
+
+        <!-- Navbar (for mobile) -->
+        <nav class="bg-base-300 shadow p-4 flex items-center justify-between lg:hidden">
+            <button id="toggleSidebar" class="btn btn-sm btn-primary">☰ Menu</button>
+            <h2 class="text-xl font-bold">{{ page_title }}</h2>
+        </nav>
+
+        <!-- Page Content -->
+        <main class="p-3">
+            {% block body %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Sidebar Toggle Script -->
+    <script>
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            let sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-64');
+        });
+    </script>
+
+    {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-        <footer id="ibzcrwlr_footer" role="contentinfo">
-            Copyright ©️ Ugly ! {{ "now"|date("Y") }}
-        </footer>
-    </body>
+    {% endblock %}
+</body>
 </html>

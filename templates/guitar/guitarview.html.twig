@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="flex justify-center items-center min-h-screen bg-gray-900 overflow-hidden">
+        <div id="guitarCanvas" class="w-full max-w-full h-full max-h-screen"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}  {# Ensures "app.js" is still loaded #}
+    {{ encore_entry_script_tags('guitarviewer') }}  {# Loads Three.js only here #}
+{% endblock %}
