@@ -36,13 +36,18 @@ class GuitarRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Guitar
-    //    {
-    //        return $this->createQueryBuilder('g')
-    //            ->andWhere('g.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function countFamilies(): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        // Correct native SQL query
+        $sql = 'SELECT COUNT(DISTINCT family) AS family_count FROM guitar';
+
+        $resultSet = $conn->executeQuery($sql);
+        $result = $resultSet->fetchAssociative();
+        // echo ($result['family_count'] . PHP_EOL);
+
+        return $result['family_count'] ?? 0; // Return the count, or 0 if null
+    }
+
 }

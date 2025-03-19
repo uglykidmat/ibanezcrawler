@@ -16,24 +16,14 @@ class CrawlerController extends AbstractController
     ) {
     }
 
-    #[Route('/', name: 'app_welcome')]
-    public function index()
-    {
-        // phpinfo();
-        return $this->json(
-            [
-                'Crawler URLs' => [
-                    'Crawl one guitar (example/test)' => '/crawler/guitar',
-                    'Crawl guitars by model (S, RG, Prestige, etc)' => '/crawler/guitars/{serie}',
-                    'Crawl guitar necks' => '/crawler/guitarnecks',
-                ],
-                'Info URLs' => [
-                    'See a specific model' => '/guitars/model/{model}',
-                    'See a specific family (S, RG, Prestige, etc)' => '/guitars/family/{serie}',
-                ],
-            ]
-        );
-    }
+    // #[Route('/', name: 'app_welcome')]
+    // public function index()
+    // {
+    //     $pageTitle = 'IBZCRWLR Homepage';
+    //     return $this->render('home.html.twig', [
+    //         'page_title' => $pageTitle
+    //     ]);
+    // }
 
     #[Route('/crawler/guitars/{serie}', name: 'crawler_guitars_by_serie')]
     public function getBySerie(string $serie): JsonResponse
